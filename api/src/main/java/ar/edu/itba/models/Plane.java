@@ -11,19 +11,9 @@ public class Plane {
     private final String modelName; //// @bruno Es necesario?
     private final EnumMap<SeatCategory, CategoryDescription> categoryRows;
 
-
     public Plane(String modelName) {
         this.modelName = modelName;
         this.categoryRows = new EnumMap<>(SeatCategory.class);
-    }
-
-    public boolean seatExists(int row, int col){
-        return true;
-    }
-
-    public SeatCategory getCategoryFromSeat(int row, char col){
-        //TODO depende de lo que hizo facu
-        return null;
     }
 
     public CategoryDescription getCategoryDescription(SeatCategory category){
@@ -42,15 +32,15 @@ public class Plane {
         return modelName;
     }
 
-    public void getCategoryFromSeat(int row, char col){
+    public SeatCategory getCategoryFromSeat(int row, char col){
         if(row <= 0 || col <= 0)
             throw new RuntimeException();
-
-        //TODO
-
+        for(Map.Entry<SeatCategory,CategoryDescription> entry : categoryRows.entrySet()){
+            if(entry.getValue().hasSeat(row,col))
+                return entry.getKey();
+        }
+        return null ;
     }
-
-
 
     @Override
     public boolean equals(Object o) {
@@ -58,6 +48,16 @@ public class Plane {
         if (o == null || getClass() != o.getClass()) return false;
         Plane plane = (Plane) o;
         return modelName.equals(plane.modelName);
+    }
+
+    public void addCategory(SeatCategory category , int rows , int columns){
+        if(categoryRows.containsKey(category))
+            return ; // throw Exception
+        int fromRow=0;
+        for (Map.Entry<SeatCategory, CategoryDescription> entry : categoryRows.entrySet()){
+            fromRow =  entry.getValue().getToRow() + 1 ;
+        }
+        categoryRows.put(category,new CategoryDescription(fromRow,fromRow+rows,columns));
     }
 
     @Override

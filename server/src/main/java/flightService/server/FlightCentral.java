@@ -1,12 +1,11 @@
 package flightService.server;
 
 import ar.edu.itba.models.Flight;
+import ar.edu.itba.models.FlightStatus;
 import ar.edu.itba.models.Plane;
+import ar.edu.itba.models.SeatCategory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FlightCentral {
 
@@ -38,6 +37,24 @@ public class FlightCentral {
 
     public Plane addModel(String modelName, Plane plane){
         return models.putIfAbsent(modelName,plane);
+    }
+
+    public List<Flight> getSuspendedFlights(){
+        List<Flight> suspended = new ArrayList<>();
+        for ( Flight flight : this.flights.values()){
+            if(flight.getFlightStatus().equals(FlightStatus.CANCELLED))
+                suspended.add(flight);
+        }
+        return suspended;
+    }
+
+    public SortedSet<Flight> getAlternativeFlights(String destiny, SeatCategory category){
+        SortedSet<Flight> alternativeFlights = new TreeSet<>();
+        for ( Flight flight : this.flights.values()){
+            if(flight.getDestiny().equals(destiny))
+                alternativeFlights.add(flight);
+        }
+        return alternativeFlights;
     }
 
 

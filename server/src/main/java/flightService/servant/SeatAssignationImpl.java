@@ -1,4 +1,4 @@
-package servant;
+package flightService.servant;
 
 import ar.edu.itba.models.Flight;
 import ar.edu.itba.models.Passenger;
@@ -42,9 +42,11 @@ public class SeatAssignationImpl implements SeatAssignation {
             throw new RemoteException();
         }
 
-        if(!flight.getPassenger(passenger).getCategory().equals(flight.getPlane().getCategoryFromSeat(row, col)))
+        Passenger p = flight.getPassenger(passenger);
+        if(!p.getCategory().equals(flight.getPlane().getCategoryFromSeat(row, col)))
             throw new RemoteException();
 
+        flight.addPassengerSeat(p, row, col);
 //        if(flight.getStatus())
 
 //        flight.addPassenger(passenger, row, col);
@@ -55,7 +57,7 @@ public class SeatAssignationImpl implements SeatAssignation {
     public void movePassenger(String code, String passenger, int row, char column) throws RemoteException {
         Flight flight = flightCentral.getFlight(code);
 //        flight.removePassenger(passenger);
-        flight.addPassenger(passenger, row, column);
+        flight.addPassengerSeat(passenger, row, column);
     }
 
     @Override

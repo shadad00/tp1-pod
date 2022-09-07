@@ -26,7 +26,7 @@ public interface FlightAdministration extends Remote {
      * @param seatList
      * @throws RemoteException
      */
-    void addFlight(String modelName, String flightCode, String destinationAirportCode, List<Seat> seatList ) throws RemoteException;
+    void addFlight(String modelName, String flightCode, String destinationAirportCode, List<Passenger> seatList ) throws RemoteException;
 
     /**
      * Consultar el estado de un vuelo a partir del código de vuelo, indicando si estápendiente, cancelado o confirmado.

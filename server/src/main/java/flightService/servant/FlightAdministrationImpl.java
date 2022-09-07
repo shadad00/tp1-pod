@@ -5,10 +5,7 @@ import ar.edu.itba.remoteInterfaces.FlightAdministration;
 import flightService.server.FlightCentral;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class FlightAdministrationImpl implements FlightAdministration {
 
@@ -58,16 +55,17 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
 
     @Override
-    public void addFlight(String modelName, String flightCode, String destinationAirportCode, List<Seat> seatList) throws RemoteException {
-        Plane plane = flightCentral.getModels(modelName);
+    public void addFlight(String modelName, String flightCode, String destinationAirportCode, List<Passenger> passengers) throws RemoteException {
+        Plane plane = Optional.ofNullable(flightCentral.getModels(modelName)).orElseThrow(RemoteException::new);    // TODO add custom exception
 
-        EnumMap<SeatCategory, Seat[][]> planeInformation= new EnumMap<>(SeatCategory.class);
+//        EnumMap<SeatCategory, Seat[][]> planeInformation= new EnumMap<>(SeatCategory.class);
 
-        for(SeatCategory category : SeatCategory.values()){
-            CategoryDescription categoryDescription = plane.getCategoryDescription(category);
-            planeInformation.put(category , new Seat[categoryDescription.getToRow() - categoryDescription.getFromRow()][categoryDescription.getColumnsNumber()]);
-        }
-        Flight newFlight = new Flight(modelName,destinationAirportCode,plane,planeInformation);
+//        for(SeatCategory category : SeatCategory.values()){
+//            CategoryDescription categoryDescription = plane.getCategoryDescription(category);
+//            planeInformation.put(category , new Seat[categoryDescription.getToRow() - categoryDescription.getFromRow()][categoryDescription.getColumnsNumber()]);
+//        }
+
+        Flight newFlight = new Flight(modelName,destinationAirportCode,plane, passengers);
 
         flightCentral.addFlight(modelName, newFlight);
     }
@@ -89,7 +87,12 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
     @Override
     public void forceTicketChangeForCancelledFlights() throws RemoteException {
+        List<Flight> suspended = this.flightCentral.getSuspendedFlights();
+        for(Flight flight : suspended){
+            SortedSet<Flight> alternatives = this.flightCentral.getAlternativeFlights(flight.getDestiny(),);
 
+
+        }
 
 
     }
