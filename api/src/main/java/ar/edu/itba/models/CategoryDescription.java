@@ -23,4 +23,8 @@ public class CategoryDescription {
         return columnsNumber;
     }
 
+     public boolean hasSeat(int row, int col){
+        return row >= fromRow && row <= toRow && col <= columnsNumber;
+     }
+
 }

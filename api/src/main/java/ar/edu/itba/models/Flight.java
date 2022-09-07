@@ -2,13 +2,14 @@ package ar.edu.itba.models;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.EnumMap;
 
 public class Flight {
     private final String flightCode;
     private final String destiny;
     private final Plane plane;
     private final EnumMap<SeatCategory, Seat[][]> seats;
-    private FlightStatus status;
+    private FlightStatus status = FlightStatus.PENDING;;
 
     private Map<Integer, Map<Character, Seat>> asientos = new HashMap<>();
 
@@ -48,15 +49,32 @@ public class Flight {
         passengers.remove(name);
     }
 
+    public Passenger getPassenger(String name){
+
+    }
+
+    public String getFlightCode() {
+        return flightCode;
+    }
+
+    public String getDestiny() {
+        return destiny;
+    }
+
     public Plane getPlane() {
         return plane;
     }
 
-    public FlightStatus getStatus(){
+    public EnumMap<SeatCategory, Seat[][]> getSeats() {
+        return seats;
+    }
+
+    public FlightStatus getFlightStatus(){
         return status;
     }
 
-    public Passenger getPassenger(String name){
-
+    public void setFlightStatus( FlightStatus flightStatus){
+        this.status = flightStatus;
     }
+
 }
