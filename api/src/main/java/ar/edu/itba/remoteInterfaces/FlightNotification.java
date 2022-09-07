@@ -1,8 +1,11 @@
 package ar.edu.itba.remoteInterfaces;
 
+import ar.edu.itba.Notifier;
+import ar.edu.itba.exceptions.IllegalUserRegistration;
 import ar.edu.itba.models.Passenger;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 public interface FlightNotification extends Remote {
     /**
@@ -10,5 +13,5 @@ public interface FlightNotification extends Remote {
      * @param flightCode
      * @param passenger
      */
-    void registerUser(String flightCode, Passenger passenger);
+    void registerUser(String flightCode, Passenger passenger, Notifier notifier) throws RemoteException, IllegalUserRegistration;
 }
