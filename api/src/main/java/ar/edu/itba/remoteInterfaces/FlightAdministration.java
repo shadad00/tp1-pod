@@ -15,7 +15,7 @@ public interface FlightAdministration extends Remote {
      * @param plane
      * @throws RemoteException
      */
-    void addPlaneModel(String modelName, EnumMap<SeatCategory, Pair<Integer>>) throws RemoteException;
+    void addPlaneModel(String modelName, EnumMap<SeatCategory, Pair<Integer>> categorySeats) throws RemoteException;
 
     /**
      * Agregar un vuelo a partir del nombre del modelo de avión, un código de vuelo, uncódigo del aeropuerto destino 

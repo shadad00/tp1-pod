@@ -30,11 +30,23 @@ public class Plane {
     }
 
     public boolean seatExists(int row, int col){
-
+        for (CategoryDescription categoryDescription : categoryRows.values()){
+            if (categoryDescription.hasSeat(row, col))
+                return true;
+        }
+        return false;
     }
 
     public String getModelName(){
         return modelName;
+    }
+
+    public void getCategoryFromSeat(int row, char col){
+        if(row <= 0 || col <= 0)
+            throw new RuntimeException();
+
+        //TODO
+
     }
 
 

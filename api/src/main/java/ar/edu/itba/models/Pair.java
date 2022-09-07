@@ -11,11 +11,11 @@ public class Pair<V> {
         this.y=y;
     }
 
-    V getX(){
+    public V getX(){
         return x;
     }
 
-    V getY(){
+    public V getY(){
         return y;
     }
 

@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class FlightCentral {
 
-    // destinos -> vuelos
+    // codigo de vuelo -> vuelos
     private final Map<String, Flight> flights;
 
     //modelos -> aviones
@@ -30,9 +30,15 @@ public class FlightCentral {
     }
 
 
-            flights.putIfAbsent(modelName,new ArrayList<>());
-        flights.get(modelName).add(newFlight);
-    public void addFlight(String )
+
+    public Flight addFlight(String flightCode, Flight newFlight){
+        return flights.putIfAbsent(flightCode,newFlight);
+    }
+
+
+    public Plane addModel(String modelName, Plane plane){
+        return models.putIfAbsent(modelName,plane);
+    }
 
 
 }
