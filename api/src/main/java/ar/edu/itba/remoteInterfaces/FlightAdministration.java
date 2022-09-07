@@ -1,12 +1,12 @@
 package ar.edu.itba.remoteInterfaces;
 
-import ar.edu.itba.models.FlightStatus;
-import ar.edu.itba.models.Plane;
-import ar.edu.itba.models.Seat;
+import ar.edu.itba.models.*;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 
 public interface FlightAdministration extends Remote {
 
@@ -15,7 +15,7 @@ public interface FlightAdministration extends Remote {
      * @param plane
      * @throws RemoteException
      */
-    void addPlaneModel(Plane plane) throws RemoteException;
+    void addPlaneModel(String modelName, EnumMap<SeatCategory, Pair<Integer>>) throws RemoteException;
 
     /**
      * Agregar un vuelo a partir del nombre del modelo de avión, un código de vuelo, uncódigo del aeropuerto destino 
@@ -26,7 +26,7 @@ public interface FlightAdministration extends Remote {
      * @param seatList
      * @throws RemoteException
      */
-    void addFlight(String modelName, String flightCode, int destinationAirportCode, List<Seat> seatList ) throws RemoteException;
+    void addFlight(String modelName, String flightCode, String destinationAirportCode, List<Seat> seatList ) throws RemoteException;
 
     /**
      * Consultar el estado de un vuelo a partir del código de vuelo, indicando si estápendiente, cancelado o confirmado.
@@ -35,7 +35,7 @@ public interface FlightAdministration extends Remote {
      * @return
      * @throws RemoteException
      */
-    FlightStatus getFlightStatus(int flightCode) throws RemoteException;
+    FlightStatus getFlightStatus(String flightCode) throws RemoteException;
 
     /**
      * Confirmar un vuelo pendiente a partir del código de vuelo.
