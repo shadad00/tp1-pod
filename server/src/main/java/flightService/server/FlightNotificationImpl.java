@@ -35,17 +35,17 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
         if(flight == null || notifier == null || flight.getFlightStatus() == FlightStatus.CONFIRMED || flight.getPassengers().get(passenger) == null){
             throw new IllegalUserRegistration("Flight not available for subscription for this user");
         }
-        registeredUsers.putIfAbsent(flight,new HashMap<>());
+        registeredUsers.putIfAbsent(flight,new ConcurrentHashMap<>());
         registeredUsers.get(flight).put(passenger,notifier);
-        notifier.notifyRegistration(flight);
+        notifier.notifyRegistration(flight.getFlightCode(),flight.getDestiny());
     }
 
 
     @Override
     public void notifyConfirmation(Flight flight){
-        for(Map.Entry<Passenger,Notifier> entries: this.registeredUsers.getOrDefault(flight,new HashMap<>()).entrySet())
+        for(Map.Entry<Passenger,Notifier> entries: this.registeredUsers.getOrDefault(flight,new ConcurrentHashMap<>()).entrySet())
             try{
-                entries.getValue().notifyConfirmation(flight);
+                entries.getValue().notifyConfirmation(flight.getFlightCode(), flight.getDestiny(), flight.getSeat(entries.getKey()));
             }catch (RemoteException remoteException){
                 LOG.info("Confirmation: Failed to callback with " + entries.getKey() +" registered at "+ flight);
             }
@@ -53,9 +53,9 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
 
     @Override
     public void notifyCancellation(Flight flight) {
-        for(Map.Entry<Passenger,Notifier> entries: this.registeredUsers.getOrDefault(flight,new HashMap<>()).entrySet())
+        for(Map.Entry<Passenger,Notifier> entries: this.registeredUsers.getOrDefault(flight,new ConcurrentHashMap<>()).entrySet())
             try{
-                entries.getValue().notifyCancellation(flight);
+                entries.getValue().notifyCancellation(flight.getFlightCode(), flight.getDestiny(), flight.getSeat(entries.getKey()));
             }catch (RemoteException remoteException){
                 LOG.info("Cancellation: Failed to callback with " + entries.getKey() +" registered at "+flight);
             }
@@ -66,7 +66,7 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
         Map<Passenger,Notifier> flightSubscriber = this.registeredUsers.get(flight);
         if( flightSubscriber!= null && flightSubscriber.get(passenger) != null) {
             try {
-                flightSubscriber.get(passenger).notifyAssignation(flight);
+                flightSubscriber.get(passenger).notifyAssignation(flight.getFlightCode(), flight.getDestiny(), flight.getSeat(passenger));
             } catch (RemoteException e) {
                 LOG.info("Assignation: failed to callback with " + passenger +" registered at "+flight);
             }
