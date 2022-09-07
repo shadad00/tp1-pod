@@ -18,4 +18,8 @@ public class Seat {
                 + ((passenger!=null)?passenger:"*") + " " +
                 category;
     }
+
+    public boolean isFree(){
+        return (passenger==null);
+    }
 }

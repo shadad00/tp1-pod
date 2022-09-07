@@ -1,11 +1,13 @@
 package ar.edu.itba.models;
 
+import javafx.util.Pair;
+
 import java.util.EnumMap;
 import java.util.Map;
 
 public class Plane {
 
-    private final String modelName;
+    private final String modelName; //// @bruno Es necesario?
     private final EnumMap<SeatCategory, CategoryDescription> categoryRows;
 
 
@@ -14,14 +16,13 @@ public class Plane {
         this.categoryRows = new EnumMap<>(SeatCategory.class);
     }
 
-    public void addCategory(SeatCategory category , int rows , int columns){
-        if(categoryRows.containsKey(category))
-            return ; // throw Exception
-        int fromRow=0;
-        for (Map.Entry<SeatCategory, CategoryDescription> entry : categoryRows.entrySet()){
-            fromRow =  entry.getValue().getToRow() + 1 ;
-        }
-        categoryRows.put(category,new CategoryDescription(fromRow,fromRow+rows,columns));
+    public boolean seatExists(int row, int col){
+        return true;
+    }
+
+    public SeatCategory getCategoryFromSeat(int row, char col){
+        //TODO depende de lo que hizo facu
+        return null;
     }
 
 }
