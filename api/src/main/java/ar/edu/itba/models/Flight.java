@@ -30,4 +30,25 @@ public class Flight {
     public FlightStatus getFlightStatus() {
         return flightStatus;
     }
+
+    public String getFlightCode() {
+        return flightCode;
+    }
+
+    public String getDestiny() {
+        return destiny;
+    }
+
+    public Seat getSeat(Passenger passenger) {
+        for (SeatCategory category : SeatCategory.values())
+            for (int i = 0; i < this.seats.get(category).length; i++)
+                for (int j = 0; j < this.seats.get(category)[i].length; j++)
+                    if (this.seats.get(category)[i][j].belongsPassenger(passenger))
+                        return this.seats.get(category)[i][j];
+
+
+        return null; //TODO:wtf
+    }
+
+
 }

@@ -10,6 +10,7 @@ import ar.edu.itba.remoteInterfaces.FlightNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
             try{
                 entries.getValue().notifyConfirmation(flight);
             }catch (RemoteException remoteException){
-                LOG.info("Confirmation: Failed to callback with " + entries.getKey() +" registered at "+flight);
+                LOG.info("Confirmation: Failed to callback with " + entries.getKey() +" registered at "+ flight);
             }
     }
 
