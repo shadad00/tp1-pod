@@ -23,4 +23,12 @@ public class CategoryDescription {
         return columnsNumber;
     }
 
+    public boolean contains(int row, int column){
+        return row >= fromRow && row <= toRow && column > 0 && column < columnsNumber;
+    }
+
+    public int getTotalSeats(){
+        return (toRow - fromRow + 1) * columnsNumber;
+    }
+
 }

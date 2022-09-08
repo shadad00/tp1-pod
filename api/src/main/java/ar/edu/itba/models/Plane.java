@@ -1,27 +1,55 @@
 package ar.edu.itba.models;
 
+import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.Map;
+import java.util.Objects;
 
 public class Plane {
 
     private final String modelName;
     private final EnumMap<SeatCategory, CategoryDescription> categoryRows;
+    private final Integer seats;
 
 
-    public Plane(String modelName) {
+
+    public Plane(String modelName, EnumMap<SeatCategory, CategoryDescription> categoryRows) {
         this.modelName = modelName;
-        this.categoryRows = new EnumMap<>(SeatCategory.class);
+        this.categoryRows = categoryRows;
+        this.seats = categoryRows.values().stream().mapToInt(CategoryDescription::getTotalSeats).reduce(0, Integer::sum);
     }
 
-    public void addCategory(SeatCategory category , int rows , int columns){
-        if(categoryRows.containsKey(category))
-            return ; // throw Exception
-        int fromRow=0;
-        for (Map.Entry<SeatCategory, CategoryDescription> entry : categoryRows.entrySet()){
-            fromRow =  entry.getValue().getToRow() + 1 ;
+    public CategoryDescription getCategoryDescription(SeatCategory category){
+        return this.categoryRows.get(category);
+    }
+
+    public boolean seatExists(int row, int col){
+        int totalRows;
+        for (SeatCategory category : SeatCategory.values()) {
+            if(categoryRows.get(category).contains(row, col))
+                return true;
         }
-        categoryRows.put(category,new CategoryDescription(fromRow,fromRow+rows,columns));
+        return false;
     }
 
+    public String getModelName(){
+        return modelName;
+    }
+
+    public Integer getSeats() {
+        return seats;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Plane plane = (Plane) o;
+        return modelName.equals(plane.modelName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modelName);
+    }
 }
