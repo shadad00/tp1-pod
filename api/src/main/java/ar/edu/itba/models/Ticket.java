@@ -1,16 +1,14 @@
 package ar.edu.itba.models;
 
-public class Ticket {
-    private String name;
+import ar.edu.itba.models.utils.RowColumnPair;
+
+import java.io.Serializable;
+
+public class Ticket implements Serializable {
+    private String passenger;
     private SeatCategory category;
+    Seat seat;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public SeatCategory getCategory() {
         return category;
@@ -18,5 +16,21 @@ public class Ticket {
 
     public void setCategory(SeatCategory category) {
         this.category = category;
+    }
+
+    public boolean hasSeat(){
+        return this.seat != null;
+    }
+
+    public String getPassenger() {
+        return passenger;
+    }
+
+    public Seat getSeat() {
+        return seat;
+    }
+
+    public void assignSeat(Seat seat){
+        this.seat = seat;
     }
 }

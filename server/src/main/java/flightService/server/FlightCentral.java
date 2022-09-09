@@ -50,4 +50,23 @@ public class FlightCentral {
     }
 
 
+    public List<Flight> getSuspendedFlights(){
+        List<Flight> suspended = new ArrayList<>();
+        for ( Flight flight : this.flights.values()){
+            if(flight.getFlightStatus().equals(FlightStatus.CANCELLED))
+                suspended.add(flight);
+        }
+        return suspended;
+    }
+
+    public List<Flight> getAlternativeFlights(String destiny, SeatCategory category){
+        List<Flight> alternativeFlights = new ArrayList<>();
+        for ( Flight flight : this.flights.values()){
+            if(flight.getDestiny().equals(destiny))
+                alternativeFlights.add(flight);
+        }
+        return alternativeFlights;
+    }
+
+
 }

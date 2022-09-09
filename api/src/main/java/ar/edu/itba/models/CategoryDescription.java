@@ -1,11 +1,15 @@
 package ar.edu.itba.models;
 
-public class CategoryDescription {
-    private final int fromRow;
-    private final int toRow;
-    private final int columnsNumber;
+import java.io.Serializable;
 
-    public CategoryDescription(int fromRow, int toRow, int columnsNumber) {
+public class CategoryDescription implements Serializable {
+    private final Integer fromRow;
+    private final Integer toRow;
+    private final Integer columnsNumber;
+    private final SeatCategory category;
+
+    public CategoryDescription(SeatCategory category, Integer fromRow, Integer toRow, Integer columnsNumber) {
+        this.category = category;
         this.fromRow = fromRow;
         this.toRow = toRow;
         this.columnsNumber = columnsNumber;
@@ -23,8 +27,20 @@ public class CategoryDescription {
         return columnsNumber;
     }
 
-    public boolean contains(int row, int column){
+    public SeatCategory getCategory() {
+        return category;
+    }
+
+    public boolean contains(Integer row, Integer column){
         return row >= fromRow && row <= toRow && column > 0 && column < columnsNumber;
+    }
+
+    public boolean containsRow(Integer row){
+        return row >= fromRow && row <= toRow;
+    }
+
+    public boolean containsColumn(Integer column){
+        return column > 0 && column < columnsNumber;
     }
 
     public int getTotalSeats(){

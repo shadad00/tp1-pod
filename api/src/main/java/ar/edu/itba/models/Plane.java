@@ -1,11 +1,12 @@
 package ar.edu.itba.models;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Objects;
 
-public class Plane {
+public class Plane implements Serializable {
 
     private final String modelName;
     private final EnumMap<SeatCategory, CategoryDescription> categoryRows;

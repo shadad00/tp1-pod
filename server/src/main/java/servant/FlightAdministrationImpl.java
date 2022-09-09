@@ -6,15 +6,16 @@ import ar.edu.itba.remoteInterfaces.FlightAdministration;
 import flightService.server.FlightCentral;
 
 import java.rmi.RemoteException;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FlightAdministrationImpl implements FlightAdministration {
 
     private FlightCentral flightCentral;
+
+    public FlightAdministrationImpl(FlightCentral flightCentral){
+        this.flightCentral=flightCentral;
+    }
 
     @Override
     public void addPlaneModel(String model, EnumMap<SeatCategory, RowColumnPair> categories) throws RemoteException {
@@ -26,7 +27,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
              ) {
             RowColumnPair pair = categories.get(category);
             if(pair.getRow() > 0 && pair.getColumn() > 0) {
-                categoryDescriptors.put(category, new CategoryDescription(totalRows+1, totalRows + pair.getRow(), pair.getColumn()));
+                categoryDescriptors.put(category, new CategoryDescription(category, totalRows+1, totalRows + pair.getRow(), pair.getColumn()));
                 totalRows += pair.getRow();
             }
         }
@@ -39,7 +40,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
     }
 
     @Override
-    public void addFlight(String modelName, String flightCode, String destinationAirportCode, List<Ticket> tickets) throws RemoteException {
+    public void addFlight(String modelName, String flightCode, String destinationAirportCode, Map<String, Ticket> tickets) throws RemoteException {
         if(!flightCentral.modelExists(modelName) || flightCentral.flightExists(flightCode))
             throw new RemoteException();
 
@@ -66,7 +67,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
     public void forceTicketChangeForCancelledFlights() {
         flightCentral.getFlights().values().stream().filter(flight -> flight.getStatus().equals(FlightStatus.CANCELLED))
                 .forEach(
-                flight -> flight.getTickets().stream().sorted(Comparator.comparing(Ticket::getName)).forEach(
+                flight -> flight.getTickets().stream().sorted(Comparator.comparing(Ticket::getPassenger)).forEach(
                         ticket -> {
 
                             List<Flight> alternatives = getAlternatives(ticket, flight.getDestiny());
@@ -85,6 +86,6 @@ public class FlightAdministrationImpl implements FlightAdministration {
     }
 
     private List<Flight> getAlternatives(Ticket ticket, String destiny) {
-        return flightCentral.getFlights().values().stream().filter(flight -> flight.getDestiny().equals(destiny)).filter(flight -> flight.hasAvailableSeats(ticket.getCategory())).collect(Collectors.toList());
+        return flightCentral.getFlights().values().stream().filter(flight -> flight.getDestiny().equals(destiny)).filter(flight -> flight.hasAvailableSeatsForCategoryOrLower(ticket.getCategory())).collect(Collectors.toList());
     }
 }

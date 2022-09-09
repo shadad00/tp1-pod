@@ -1,6 +1,8 @@
 package ar.edu.itba.models;
 
-public class Passenger {
+import java.io.Serializable;
+
+public class Passenger implements Serializable {
         private final String name;
 
         public Passenger(String name) {

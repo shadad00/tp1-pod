@@ -1,21 +1,32 @@
 package ar.edu.itba.models;
 
-public class Seat {
+import java.io.Serializable;
+
+public class Seat implements Serializable {
     private final int row, column;
     private final SeatCategory category ;
-    private final Passenger passenger;
 
-    public Seat(int row, int column, SeatCategory category, Passenger passenger) {
+    public Seat(int row, int column, SeatCategory category) {
         this.row = row;
         this.column = column;
         this.category = category;
-        this.passenger = passenger;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public SeatCategory getCategory() {
+        return category;
     }
 
     @Override
     public String toString() {
-        return  (row+1) + " " + ('A' + column) + " "
-                + ((passenger!=null)?passenger:"*") + " " +
+        return  (row+1) + " " + ('A' + column) + " " +
                 category;
     }
 }
