@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class Ticket implements Serializable {
     private String passenger;
     private SeatCategory category;
-    Seat seat;
+    private Seat seat;
 
 
     public SeatCategory getCategory() {
@@ -33,4 +33,10 @@ public class Ticket implements Serializable {
     public void assignSeat(Seat seat){
         this.seat = seat;
     }
+
+    public void clearSeat(){
+        this.seat = null;
+    }
+
+
 }

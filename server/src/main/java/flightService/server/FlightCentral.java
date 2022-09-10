@@ -1,11 +1,10 @@
 package flightService.server;
 
-import ar.edu.itba.models.Flight;
-import ar.edu.itba.models.FlightStatus;
-import ar.edu.itba.models.Plane;
-import ar.edu.itba.models.SeatCategory;
+import ar.edu.itba.models.*;
+import jdk.jfr.DataAmount;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FlightCentral {
 
@@ -50,22 +49,12 @@ public class FlightCentral {
     }
 
 
-    public List<Flight> getSuspendedFlights(){
-        List<Flight> suspended = new ArrayList<>();
-        for ( Flight flight : this.flights.values()){
-            if(flight.getFlightStatus().equals(FlightStatus.CANCELLED))
-                suspended.add(flight);
-        }
-        return suspended;
-    }
-
-    public List<Flight> getAlternativeFlights(String destiny, SeatCategory category){
-        List<Flight> alternativeFlights = new ArrayList<>();
-        for ( Flight flight : this.flights.values()){
-            if(flight.getDestiny().equals(destiny))
-                alternativeFlights.add(flight);
-        }
-        return alternativeFlights;
+    public List<Flight> getAlternativeFlights(SeatCategory category, String destiny){
+            return this.flights.values().stream()
+                .filter(
+                        flight -> flight.getStatus().equals(FlightStatus.PENDING)
+                                && flight.getDestiny().equals(destiny)
+                                && flight.hasAvailableSeatsForCategoryOrLower(category)).collect(Collectors.toList());
     }
 
 

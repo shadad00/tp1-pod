@@ -1,22 +1,14 @@
 package ar.edu.itba.models;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.*;
 
 public class Flight implements Serializable {
+
     private final String flightCode;
     private final String destiny;
-
-
-//    private final EnumMap<SeatCategory, Integer> availableSeats;
-
     private final EnumMap<SeatCategory, CategorySeats> categorySeats;
-
-
-
     private FlightStatus status;
-
     private final Map<String, Ticket> tickets;
 
     public Flight(String flightCode, String destiny, Plane plane, Map<String, Ticket> tickets) {
@@ -124,11 +116,22 @@ public class Flight implements Serializable {
 
     public void freePassengerSeat(String passengerName){
         Ticket ticket = tickets.get(passengerName);
-
         if(ticket.hasSeat()){
             categorySeats.get(ticket.getCategory()).freeSeat(ticket.getSeat().getRow(), ticket.getSeat().getColumn());
+            ticket.clearSeat();
         }
 
+    }
+
+    public boolean passengerExists(String passenger){
+        return tickets.containsKey(passenger);
+    }
+
+    public Ticket deletePassenger(String passenger){
+        Ticket ticket = Optional.ofNullable(tickets.get(passenger)).orElseThrow(IllegalArgumentException::new);
+        ticket.clearSeat();
+        tickets.remove(passenger);
+        return ticket;
     }
 
     public boolean seatExists(Integer row, Integer column){

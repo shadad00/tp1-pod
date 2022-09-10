@@ -50,22 +50,31 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
     @Override
     public FlightStatus getFlightStatus(String flightCode) throws RemoteException {
+        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
+        if(!flight.getStatus().equals(FlightStatus.PENDING))
+            throw new RemoteException();
         return Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new).getStatus();
     }
 
     @Override
     public void confirmFlight(String flightCode) throws RemoteException {
-        Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new).setStatus(FlightStatus.CONFIRMED);
+        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
+        if(!flight.getStatus().equals(FlightStatus.PENDING))
+            throw new RemoteException();
+        flight.setStatus(FlightStatus.CONFIRMED);
     }
 
     @Override
     public void cancelFlight(String flightCode) throws RemoteException {
-        Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new).setStatus(FlightStatus.CANCELLED);
+        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
+        if(!flight.getStatus().equals(FlightStatus.PENDING))
+            throw new RemoteException();
+        flight.setStatus(FlightStatus.CANCELLED);
     }
 
     @Override
     public void forceTicketChangeForCancelledFlights() {
-        flightCentral.getFlights().values().stream().filter(flight -> flight.getStatus().equals(FlightStatus.CANCELLED))
+        flightCentral.getFlights().values().stream().filter(flight -> flight.getStatus().equals(FlightStatus.CANCELLED)).sorted(Comparator.comparing(Flight::getFlightCode))
                 .forEach(
                 flight -> flight.getTickets().stream().sorted(Comparator.comparing(Ticket::getPassenger)).forEach(
                         ticket -> {
@@ -76,7 +85,10 @@ public class FlightAdministrationImpl implements FlightAdministration {
                                 Optional<Flight> newFlight = alternatives.stream().min(Comparator.comparing((Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
                                         .thenComparingInt(Flight::getAvailableSeats).reversed()
                                         .thenComparing(Flight::getFlightCode));
-                                newFlight.ifPresent(value -> value.addTicket(ticket));
+                                newFlight.ifPresent(value -> {
+                                    value.addTicket(ticket);
+                                    ticket.clearSeat();
+                                });
                             }
 
                         }
@@ -86,6 +98,6 @@ public class FlightAdministrationImpl implements FlightAdministration {
     }
 
     private List<Flight> getAlternatives(Ticket ticket, String destiny) {
-        return flightCentral.getFlights().values().stream().filter(flight -> flight.getDestiny().equals(destiny)).filter(flight -> flight.hasAvailableSeatsForCategoryOrLower(ticket.getCategory())).collect(Collectors.toList());
+        return flightCentral.getAlternativeFlights(ticket.getCategory(),destiny);
     }
 }

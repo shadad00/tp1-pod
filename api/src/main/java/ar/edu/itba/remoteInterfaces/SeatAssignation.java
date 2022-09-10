@@ -49,5 +49,5 @@ public interface SeatAssignation extends Remote {
      * Cambiar el ticket de vuelo, a partir del nombre del pasajero, el código de vuelooriginal y el código de vuelo alternativo
      * @throws RemoteException
      */
-    void changeTicket(Passenger passenger, Flight original, Flight alternative) throws RemoteException;
+    void changeTicket(String passenger, String original, String alternative) throws RemoteException;
 }

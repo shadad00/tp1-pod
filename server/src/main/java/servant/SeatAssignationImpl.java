@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class SeatAssignationImpl implements SeatAssignation {
 
@@ -39,12 +40,21 @@ public class SeatAssignationImpl implements SeatAssignation {
 
     @Override
     public List<Flight> checkAlternativeFlights(Flight flight, Ticket ticket) throws RemoteException {
-//        return flightCentral.getAlternativeFlights(flight.getDestiny(), ticket.getCategory()).sort(Comparator.comparing());
-        return null;
+        return flightCentral.getAlternativeFlights( ticket.getCategory(), flight.getDestiny()).stream().sorted(
+                Comparator.comparing((Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
+                        .thenComparingInt(Flight::getAvailableSeats).reversed()
+                        .thenComparing(Flight::getFlightCode)
+        ).collect(Collectors.toList());
+
     }
 
     @Override
-    public void changeTicket(Passenger passenger, Flight original, Flight alternative) throws RemoteException {
-
+    public void changeTicket(String passenger, String original, String alternative) throws RemoteException {
+        Flight originalFlight = Optional.ofNullable(flightCentral.getFlight(original)).orElseThrow(RemoteException::new);
+        Flight alternativeFlight = Optional.ofNullable(flightCentral.getFlight(alternative)).orElseThrow(RemoteException::new);
+        if(!originalFlight.passengerExists(passenger))
+            throw new RemoteException();
+        Ticket ticket = originalFlight.deletePassenger(passenger);
+        alternativeFlight.addTicket(ticket);
     }
 }
