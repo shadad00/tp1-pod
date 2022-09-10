@@ -7,14 +7,14 @@ public class Flight implements Serializable {
 
     private final String flightCode;
     private final String destiny;
-    private final EnumMap<SeatCategory, CategorySeats> categorySeats;
     private FlightStatus status;
+    private final EnumMap<SeatCategory, CategorySeats> categorySeats;
     private final Map<String, Ticket> tickets;
 
     public Flight(String flightCode, String destiny, Plane plane, Map<String, Ticket> tickets) {
         this.flightCode = flightCode;
         this.destiny = destiny;
-
+        this.status = FlightStatus.PENDING;
 
 
         this.categorySeats = new EnumMap<>(SeatCategory.class);
@@ -96,17 +96,19 @@ public class Flight implements Serializable {
         tickets.put(ticket.getPassenger(), ticket);
     }
 
-    public void assignSeat(String passenger, Integer row, Integer col){
+    public boolean assignSeat(String passenger, Integer row, Integer col){
         if(status != FlightStatus.PENDING)
-            return; //para asignar un asiento solo debe estar pendiente el vuelo
+            return false; //para asignar un asiento solo debe estar pendiente el vuelo
         Ticket ticket;
 
         if((ticket=Optional.ofNullable(tickets.get(passenger)).orElseThrow(IllegalArgumentException::new)).getSeat() != null)
-            return; //el pasajero ya tiene un asiento en el vuelo
+            return false; //el pasajero ya tiene un asiento en el vuelo
 
         for(Map.Entry<SeatCategory, CategorySeats> entry: categorySeats.entrySet())
-            if (entry.getKey().ordinal() <= ticket.getCategory().ordinal() && entry.getValue().assignSeat(row, col,ticket) != null)
-                return;
+            if (entry.getKey().ordinal() <= ticket.getCategory().ordinal() && entry.getValue().assignSeat(row, col,ticket) != null){
+                return true;
+            }
+        return false;
     }
 
     public void freePassengerSeat(String passengerName){

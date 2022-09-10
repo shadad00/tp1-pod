@@ -1,4 +1,4 @@
-package ar.edu.itba;
+package ar.edu.itba.remoteInterfaces;
 
 import ar.edu.itba.models.Flight;
 import ar.edu.itba.models.Seat;
@@ -7,6 +7,10 @@ import ar.edu.itba.models.Ticket;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+
+/**
+ * Exposed interface by server to provide notification service by callbacks.
+ * */
 
 public interface Notifier extends Remote {
     void notifyRegistration(String flightCode, String destination) throws RemoteException;

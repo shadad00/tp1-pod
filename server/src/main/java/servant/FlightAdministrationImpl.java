@@ -20,6 +20,9 @@ public class FlightAdministrationImpl implements FlightAdministration {
     @Override
     public void addPlaneModel(String model, EnumMap<SeatCategory, RowColumnPair> categories) throws RemoteException {
 
+        if(flightCentral.getModels(model) != null)
+            throw new IllegalArgumentException();
+
         EnumMap<SeatCategory, CategoryDescription> categoryDescriptors = new EnumMap<>(SeatCategory.class);
 
         int totalRows = 0;
@@ -33,7 +36,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
         }
 
         if(totalRows <= 0)
-            throw new RemoteException();        //// TODO add custom exception
+            throw new IllegalArgumentException();
 
         flightCentral.addModel(model, new Plane(model, categoryDescriptors));
 
@@ -41,8 +44,9 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
     @Override
     public void addFlight(String modelName, String flightCode, String destinationAirportCode, Map<String, Ticket> tickets) throws RemoteException {
-        if(!flightCentral.modelExists(modelName) || flightCentral.flightExists(flightCode))
-            throw new RemoteException();
+        if(!flightCentral.modelExists(modelName)
+                || flightCentral.flightExists(flightCode) )
+            throw new IllegalArgumentException();
 
         flightCentral.addFlight(flightCode, new Flight(flightCode, destinationAirportCode, flightCentral.getModels(modelName), tickets));
 
@@ -50,44 +54,51 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
     @Override
     public FlightStatus getFlightStatus(String flightCode) throws RemoteException {
-        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
-        if(!flight.getStatus().equals(FlightStatus.PENDING))
-            throw new RemoteException();
-        return Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new).getStatus();
+        return Optional.ofNullable(flightCentral.getFlight(flightCode))
+                .orElseThrow(IllegalArgumentException::new).getFlightStatus();
     }
 
     @Override
     public void confirmFlight(String flightCode) throws RemoteException {
         Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
         if(!flight.getStatus().equals(FlightStatus.PENDING))
-            throw new RemoteException();
+            throw new IllegalArgumentException();
         flight.setStatus(FlightStatus.CONFIRMED);
+        flightCentral.notifyConfirmation(flight);
     }
 
     @Override
     public void cancelFlight(String flightCode) throws RemoteException {
         Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
         if(!flight.getStatus().equals(FlightStatus.PENDING))
-            throw new RemoteException();
+            throw new IllegalArgumentException();
         flight.setStatus(FlightStatus.CANCELLED);
+        flightCentral.notifyCancellation(flight);
     }
 
     @Override
     public void forceTicketChangeForCancelledFlights() {
-        flightCentral.getFlights().values().stream().filter(flight -> flight.getStatus().equals(FlightStatus.CANCELLED)).sorted(Comparator.comparing(Flight::getFlightCode))
+        flightCentral.getFlights().values().stream().filter(flight -> flight.getStatus().equals(FlightStatus.CANCELLED))
+                .sorted(Comparator.comparing(Flight::getFlightCode))
+                //for each cancelled flight ordered by flightCode.
                 .forEach(
-                flight -> flight.getTickets().stream().sorted(Comparator.comparing(Ticket::getPassenger)).forEach(
+                oldFlight -> oldFlight.getTickets().stream().sorted(Comparator.comparing(Ticket::getPassenger))
+                        //For each passenger in the flight order by Passenger's name.
+                        .forEach(
                         ticket -> {
 
-                            List<Flight> alternatives = getAlternatives(ticket, flight.getDestiny());
+                            List<Flight> alternatives = getAlternatives(ticket, oldFlight.getDestiny());
 
                             if(!alternatives.isEmpty()){
-                                Optional<Flight> newFlight = alternatives.stream().min(Comparator.comparing((Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
+                                Optional<Flight> maybeNewFlight = alternatives.stream()
+                                        .min(Comparator.comparing((Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
                                         .thenComparingInt(Flight::getAvailableSeats).reversed()
                                         .thenComparing(Flight::getFlightCode));
-                                newFlight.ifPresent(value -> {
-                                    value.addTicket(ticket);
+                                maybeNewFlight.ifPresent(newFlight -> {
                                     ticket.clearSeat();
+                                    newFlight.addTicket(ticket);
+                                    //todo: remove ticket from oldFlight ?
+                                    //todo: notify service ?
                                 });
                             }
 

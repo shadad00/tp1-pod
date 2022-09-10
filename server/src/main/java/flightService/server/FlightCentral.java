@@ -1,12 +1,13 @@
 package flightService.server;
 
 import ar.edu.itba.models.*;
-import jdk.jfr.DataAmount;
+import ar.edu.itba.remoteInterfaces.Notifier;
+import servant.FlightNotificationImpl;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FlightCentral {
+public class FlightCentral implements FlightMonitor{
 
     // codigo de vuelo -> vuelos
     private final Map<String, Flight> flights;
@@ -14,9 +15,12 @@ public class FlightCentral {
     //modelos -> aviones
     private final Map<String, Plane> models;
 
+    private final FlightMonitor internalNotifier;
+
     public FlightCentral() {
         flights = new HashMap<>();
         models = new HashMap<>();
+        internalNotifier =new FlightNotificationImpl(this); //register this to export
     }
 
     public Flight getFlight(String code){
@@ -57,5 +61,20 @@ public class FlightCentral {
                                 && flight.hasAvailableSeatsForCategoryOrLower(category)).collect(Collectors.toList());
     }
 
+    public void notifyConfirmation(Flight flight){
+        internalNotifier.notifyConfirmation(flight);
+    }
+    public void notifyCancellation(Flight flight){
+        internalNotifier.notifyCancellation(flight);
+    }
+    public void notifyAssignation(String passenger, Flight flight) {
+        internalNotifier.notifyAssignation(passenger,flight);
+    }
+    public void notifySeatChange(String passenger, Seat originalSeat, Flight flight) {
+        internalNotifier.notifySeatChange(passenger, originalSeat, flight);
+    }
+    public void notifyFlightChange(String passenger, Flight oldFlight, Flight newFlight) {
+        internalNotifier.notifyFlightChange(passenger, oldFlight, newFlight);
+    }
 
 }
