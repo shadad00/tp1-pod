@@ -1,19 +1,19 @@
 package ar.edu.itba.models;
 
-import ar.edu.itba.models.utils.RowColumnPair;
-
-import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.Arrays;
 
 public class CategorySeats {
 
     private final CategoryDescription description;
-    private final Seat[][] seats;
+    private final Ticket[][] ticketSeats;
 
     public CategorySeats(CategoryDescription description) {
         this.description = description;
-        this.seats = new Seat[description.getToRow() - description.getFromRow() + 1][description.getColumnsNumber()];
+        this.ticketSeats = new Ticket[description.getToRow() - description.getFromRow() + 1][description.getColumnsNumber()];
+    }
+
+    public Integer getFromRow(){
+        return description.getFromRow();
     }
 
     public Integer getNrows() {
@@ -24,48 +24,54 @@ public class CategorySeats {
         return description.getColumnsNumber();
     }
 
-    public Seat[][] getSeats() {
-        return seats;
+    public Ticket[][] getTicketSeats() {
+        return ticketSeats;
     }
 
-    public Seat[] getRow(Integer row){
+    public Ticket[] getRow(Integer row){
         if(!description.containsRow(row))
             throw new IllegalArgumentException("Row does not exists");
-        return seats[getRealRowIndex(row)];
+        return ticketSeats[getRealRowIndex(row)];
     }
 
     public boolean contains(Integer row, Integer col){
         return description.contains(row, col);
     }
 
+    public boolean containsRow(Integer row){
+        return description.containsRow(row);
+    }
+
     public Integer getAvailableSeats(){
-        return Arrays.stream(seats).mapToInt(row -> Arrays.stream(row).mapToInt(seat -> seat == null? 0 : 1).reduce(0, Integer::sum)).reduce(0, Integer::sum);
+        return Arrays.stream(ticketSeats).mapToInt(row -> Arrays.stream(row).mapToInt(seat -> seat == null? 0 : 1).reduce(0, Integer::sum)).reduce(0, Integer::sum);
     }
 
     public boolean isSeatAvailable(Integer row, Integer col){
         if(!contains(row, col))
             throw new IllegalArgumentException();
 
-        return seats[getRealRowIndex(row)][col]==null;
+        return ticketSeats[getRealRowIndex(row)][col]==null;
     }
 
-    public Seat assignSeat(Integer row, Integer col){
+    public Ticket assignSeat(Integer row, Integer col,Ticket ticket){
         if(!contains(row, col))
             throw new IllegalArgumentException();
 
         // trato de asignarle el asiento pedido
         if (isSeatAvailable(row, col)) {
-            Integer newRow = getRealRowIndex(row);
-            seats[newRow][col] = new Seat(row, col, description.getCategory());
-            return seats[newRow][col];
+            int newRow = getRealRowIndex(row);
+            ticket.assignSeat(new Seat(newRow,col,ticket.getCategory()));
+            ticketSeats[newRow][col] = ticket;
+            return ticketSeats[newRow][col];
         }
 
         // trato de asignarle un asiento libre de esta categoria
-        for (int i = 0; i < seats.length; i++) {
-            for (int j = 0; j < seats[0].length; j++) {
+        for (int i = 0; i < ticketSeats.length; i++) {
+            for (int j = 0; j < ticketSeats[0].length; j++) {
                 if (isSeatAvailable(i, j)) {
-                    seats[i][j] = new Seat(getRealRow(i), j, description.getCategory());
-                    return seats[i][j];
+                    ticket.assignSeat(new Seat(i,j,ticket.getCategory()));
+                    ticketSeats[i][j] = ticket;
+                    return ticketSeats[i][j];
                 }
 
             }
@@ -78,7 +84,7 @@ public class CategorySeats {
         if(!contains(row, column))
             throw new IllegalArgumentException();
 
-        seats[getRealRowIndex(row)][column] = null;
+        ticketSeats[getRealRowIndex(row)][column] = null;
     }
 
     private int getRealRowIndex(Integer row){

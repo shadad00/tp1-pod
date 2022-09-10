@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class SeatAssignationImpl implements SeatAssignation {
 
-    private FlightCentral flightCentral;
+    private final FlightCentral flightCentral;
 
     public SeatAssignationImpl(FlightCentral flightCentral) {
         this.flightCentral = flightCentral;

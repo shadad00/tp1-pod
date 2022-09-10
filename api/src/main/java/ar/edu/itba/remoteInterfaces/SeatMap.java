@@ -12,20 +12,20 @@ public interface SeatMap extends Remote{
      * @param flightCode
      * @throws RemoteException
      */
-    void getSeatMap(String flightCode) throws RemoteException;
+    String getSeatMap(String flightCode) throws RemoteException;
 
     /**
      * Consultar el mapa de asientos de un vuelo de una categoria indicada, a partir del código del mismo
      * @param flightCode
      * @throws RemoteException
      */
-    void getSeatMapByCategory(String flightCode , SeatCategory category) throws RemoteException;
+    String getSeatMapByCategory(String flightCode , SeatCategory category) throws RemoteException;
 
     /**
      * Consultar el mapa de asientos de un vuelo de una fila indicada, a partir del código del mismo
      * @param flightCode
      * @throws RemoteException
      */
-    void getSeatMapByRow(String flightCode , int row) throws RemoteException;
+    String getSeatMapByRow(String flightCode , int row) throws RemoteException;
 
 }

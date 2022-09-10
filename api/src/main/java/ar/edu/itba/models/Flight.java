@@ -25,6 +25,18 @@ public class Flight implements Serializable {
         this.tickets = tickets;
     }
 
+    public CategorySeats getCategorySeats(SeatCategory category){
+        return this.categorySeats.get(category);
+    }
+
+    public SeatCategory getCategoryFromRow(int row){
+        for (SeatCategory category : SeatCategory.values()) {
+            if(categorySeats.get(category).containsRow(row))
+                return category;
+        }
+        return null;
+    }
+
 
     public FlightStatus getStatus() {
         return status;
@@ -88,30 +100,13 @@ public class Flight implements Serializable {
         if(status != FlightStatus.PENDING)
             return; //para asignar un asiento solo debe estar pendiente el vuelo
         Ticket ticket;
+
         if((ticket=Optional.ofNullable(tickets.get(passenger)).orElseThrow(IllegalArgumentException::new)).getSeat() != null)
             return; //el pasajero ya tiene un asiento en el vuelo
 
-
-        Seat seat = null;
-        for(Map.Entry<SeatCategory, CategorySeats> entry: categorySeats.entrySet()) {
-
-            if (entry.getKey().ordinal() <= ticket.getCategory().ordinal())
-                seat = entry.getValue().assignSeat(row, col);
-                if (seat != null) {
-                    ticket.assignSeat(seat);
-                    return; // ya se asigno el asiento
-                }
-
-        }
-
-//        for (int i = ticket.getCategory().ordinal(); i < SeatCategory.values().length; i++) {
-//            seat = categorySeats.get(SeatCategory.values()[i]).assignSeat(row, col);
-//            if (seat != null) {
-//                ticket.assignSeat(seat);
-//                return; // ya se asigno el asiento
-//            }
-//        }
-
+        for(Map.Entry<SeatCategory, CategorySeats> entry: categorySeats.entrySet())
+            if (entry.getKey().ordinal() <= ticket.getCategory().ordinal() && entry.getValue().assignSeat(row, col,ticket) != null)
+                return;
     }
 
     public void freePassengerSeat(String passengerName){
