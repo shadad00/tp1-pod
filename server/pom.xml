@@ -4,17 +4,17 @@
    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <parent>
-      <artifactId>flightService-parent</artifactId>
-      <groupId>flightService</groupId>
+      <artifactId>tp1-g14-parent</artifactId>
+      <groupId>tp1-g14</groupId>
       <version>1.0-SNAPSHOT</version>
    </parent>
-   <artifactId>flightService-server</artifactId>
+   <artifactId>tp1-g14-server</artifactId>
    <version>1.0-SNAPSHOT</version>
-   <name>flightService-server</name>
+   <name>tp1-g14-server</name>
    <dependencies>
       <dependency>
-         <groupId>flightService</groupId>
-         <artifactId>flightService-api</artifactId>
+         <groupId>tp1-g14</groupId>
+         <artifactId>tp1-g14-api</artifactId>
          <version>1.0-SNAPSHOT</version>
       </dependency>
    </dependencies>
