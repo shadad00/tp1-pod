@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FlightNotificationImpl implements FlightNotification, FlightMonitor {
 
     private final FlightCentral flightCentral;
-    private final Map<Flight, Map<Passenger, Notifier> > registeredUsers;
+    private final Map<Flight, Map<String, Notifier> > registeredUsers;
     private static final Logger LOG = LoggerFactory.getLogger(FlightNotificationImpl.class);
 
 
@@ -30,9 +30,9 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
     }
 
     @Override
-    public void registerUser(String flightCode, Passenger passenger, Notifier notifier) throws IllegalUserRegistration, RemoteException {
+    public void registerUser(String flightCode, String passenger, Notifier notifier) throws IllegalUserRegistration, RemoteException {
         Flight flight = flightCentral.getFlight(flightCode);
-        if(flight == null || notifier == null || flight.getFlightStatus() == FlightStatus.CONFIRMED || flight.getPassengers().get(passenger) == null){
+        if(flight == null || notifier == null || flight.getFlightStatus() == FlightStatus.CONFIRMED || !flight.passengerExists(passenger)){
             throw new IllegalUserRegistration("Flight not available for subscription for this user");
         }
         registeredUsers.putIfAbsent(flight,new ConcurrentHashMap<>());
@@ -43,9 +43,9 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
 
     @Override
     public void notifyConfirmation(Flight flight){
-        for(Map.Entry<Passenger,Notifier> entries: this.registeredUsers.getOrDefault(flight,new ConcurrentHashMap<>()).entrySet())
+        for(Map.Entry<String,Notifier> entries: this.registeredUsers.getOrDefault(flight,new ConcurrentHashMap<>()).entrySet())
             try{
-                entries.getValue().notifyConfirmation(flight.getFlightCode(), flight.getDestiny(), flight.getSeat(entries.getKey()));
+                entries.getValue().notifyConfirmation(flight.getFlightCode(), flight.getDestiny(), flight.getTicket(entries.getKey()).getSeat());
             }catch (RemoteException remoteException){
                 LOG.info("Confirmation: Failed to callback with " + entries.getKey() +" registered at "+ flight);
             }
@@ -53,20 +53,20 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
 
     @Override
     public void notifyCancellation(Flight flight) {
-        for(Map.Entry<Passenger,Notifier> entries: this.registeredUsers.getOrDefault(flight,new ConcurrentHashMap<>()).entrySet())
+        for(Map.Entry<String,Notifier> entries: this.registeredUsers.getOrDefault(flight,new ConcurrentHashMap<>()).entrySet())
             try{
-                entries.getValue().notifyCancellation(flight.getFlightCode(), flight.getDestiny(), flight.getSeat(entries.getKey()));
+                entries.getValue().notifyCancellation(flight.getFlightCode(), flight.getDestiny(), flight.getTicket(entries.getKey()).getSeat());
             }catch (RemoteException remoteException){
                 LOG.info("Cancellation: Failed to callback with " + entries.getKey() +" registered at "+flight);
             }
     }
 
     @Override
-    public void notifyAssignation(Passenger passenger, Flight flight) {
-        Map<Passenger,Notifier> flightSubscriber = this.registeredUsers.get(flight);
+    public void notifyAssignation(String passenger, Flight flight) {
+        Map<String,Notifier> flightSubscriber = this.registeredUsers.get(flight);
         if( flightSubscriber!= null && flightSubscriber.get(passenger) != null) {
             try {
-                flightSubscriber.get(passenger).notifyAssignation(flight.getFlightCode(), flight.getDestiny(), flight.getSeat(passenger));
+                flightSubscriber.get(passenger).notifyAssignation(flight.getFlightCode(), flight.getDestiny(), flight.getTicket(passenger).getSeat());
             } catch (RemoteException e) {
                 LOG.info("Assignation: failed to callback with " + passenger +" registered at "+flight);
             }
@@ -74,11 +74,11 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
     }
 
     @Override
-    public void notifySeatChange(Passenger passenger, Seat originalSeat, Flight flight){
-        Map<Passenger,Notifier> flightSubscriber = this.registeredUsers.get(flight);
+    public void notifySeatChange(String passenger, Seat originalSeat, Flight flight){
+        Map<String,Notifier> flightSubscriber = this.registeredUsers.get(flight);
         if( flightSubscriber!= null && flightSubscriber.get(passenger) != null) {
             try {
-                flightSubscriber.get(passenger).notifySeatChange(originalSeat, flight);
+                flightSubscriber.get(passenger).notifySeatChange(passenger, originalSeat, flight);
             } catch (RemoteException e) {
                 LOG.info("Seat change: failed to callback with " + passenger +" registered at "+ flight);
             }
@@ -86,9 +86,9 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
     }
 
     @Override
-    public void notifyFlightChange(Passenger passenger, Flight oldFlight, Flight newFlight) {
+    public void notifyFlightChange(String passenger, Flight oldFlight, Flight newFlight) {
 
-        Map<Passenger,Notifier> flightSubscriber = this.registeredUsers.get(oldFlight);
+        Map<String,Notifier> flightSubscriber = this.registeredUsers.get(oldFlight);
         if( flightSubscriber!= null && flightSubscriber.get(passenger) != null) {
             try {
                 flightSubscriber.get(passenger).notifyFlightChange(oldFlight, newFlight);

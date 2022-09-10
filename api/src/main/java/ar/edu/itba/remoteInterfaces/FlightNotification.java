@@ -13,5 +13,5 @@ public interface FlightNotification extends Remote {
      * @param flightCode
      * @param passenger
      */
-    void registerUser(String flightCode, Passenger passenger, Notifier notifier) throws RemoteException, IllegalUserRegistration;
+    void registerUser(String flightCode, String passenger, Notifier notifier) throws RemoteException, IllegalUserRegistration;
 }

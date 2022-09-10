@@ -9,7 +9,7 @@ import java.rmi.RemoteException;
 public interface FlightMonitor {
     void notifyConfirmation(Flight flight);
     void notifyCancellation(Flight flight);
-    void notifyAssignation(Passenger passenger, Flight flight) ;
-    void notifySeatChange(Passenger passenger, Seat originalSeat, Flight flight) ;
-    void notifyFlightChange(Passenger passenger, Flight oldFlight, Flight newFlight) ;
+    void notifyAssignation(String passenger, Flight flight) ;
+    void notifySeatChange(String passenger, Seat originalSeat, Flight flight) ;
+    void notifyFlightChange(String passenger, Flight oldFlight, Flight newFlight) ;
 }

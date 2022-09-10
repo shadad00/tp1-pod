@@ -137,5 +137,9 @@ public class Flight implements Serializable {
         return false;
     }
 
+    public Ticket getTicket(String passenger){
+        return this.tickets.get(passenger);
+    }
+
 
 }

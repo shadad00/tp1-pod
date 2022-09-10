@@ -39,8 +39,8 @@ public class NotifierImpl implements Notifier {
     }
 
     @Override
-    public void notifySeatChange(Seat originalSeat, Flight flight) throws RemoteException {
-       Seat newSeat =  flight.getPassengers().get(originalSeat.getPassenger());
+    public void notifySeatChange(String passenger, Seat originalSeat, Flight flight) throws RemoteException {
+       Seat newSeat =  flight.getTicket(passenger).getSeat();
         System.out.println("Your seat changed to " +
                 newSeat.getCategory() +
                 " " + newSeat.getRow() +
