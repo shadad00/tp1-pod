@@ -88,7 +88,7 @@ public class Flight implements Serializable {
         if(status != FlightStatus.PENDING)
             return; //para asignar un asiento solo debe estar pendiente el vuelo
         Ticket ticket;
-        if((ticket=tickets.getOrDefault(passenger, new Ticket())).getSeat() != null)
+        if((ticket=Optional.ofNullable(tickets.get(passenger)).orElseThrow(IllegalArgumentException::new)).getSeat() != null)
             return; //el pasajero ya tiene un asiento en el vuelo
 
 
