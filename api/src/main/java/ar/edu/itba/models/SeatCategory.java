@@ -1,7 +1,9 @@
 package ar.edu.itba.models;
 
-public enum SeatCategory {
+import java.io.Serializable;
+
+public enum SeatCategory implements Serializable {
     BUSINESS,
-    PREMIUM_ECONOMIC,
-    ECONOMIC
+    PREMIUM_ECONOMY,
+    ECONOMY
 }

@@ -1,6 +1,6 @@
 package flightService.client.arguments;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
+
 
 import java.util.Properties;
 
@@ -70,7 +70,7 @@ public class ArgumentsSeatAssignation{
         return originalFlight;
     }
 
-    public void parseArguments() throws InvalidArgumentException {
+    public void parseArguments() throws IllegalArgumentException {
 
         Properties properties = System.getProperties();
 
@@ -78,21 +78,21 @@ public class ArgumentsSeatAssignation{
 
             this.serverAddress = properties.getProperty(SERVER);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for server address"});
+            throw new IllegalArgumentException("Invalid argument for server address");
         }
 
         if(properties.containsKey(ACTION)){
 
             this.action = properties.getProperty(ACTION);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for action"});
+            throw new IllegalArgumentException("Invalid argument for action");
         }
 
         if(properties.containsKey(FLIGHT)){
 
             this.flightCode = properties.getProperty(FLIGHT);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for flight"});
+            throw new IllegalArgumentException("Invalid argument for flight");
         }
 
 
@@ -103,7 +103,7 @@ public class ArgumentsSeatAssignation{
 
                 this.passenger = properties.getProperty(PASSENGER);
             }else{
-                throw new InvalidArgumentException(new String[]{"Invalid argument for passenger"});
+                throw new IllegalArgumentException("Invalid argument for passenger");
             }
         }
 
@@ -112,15 +112,14 @@ public class ArgumentsSeatAssignation{
 
                 this.row = Integer.getInteger(properties.getProperty(ROW));
             }else{
-                throw new InvalidArgumentException(new String[]{"Invalid argument for row"});
+                throw new IllegalArgumentException("Invalid argument for row");
             }
 
             if(properties.containsKey(COL)){
 
-                this.col = Character.getNumericValue(properties.getProperty(COL).charAt(0)) - 'A' + 1 ;
-                //TODO esto es un char
+                this.col = (char) (properties.getProperty(COL).charAt(0) - 'A' + 1);
             }else{
-                throw new InvalidArgumentException(new String[]{"Invalid argument for col"});
+                throw new IllegalArgumentException("Invalid argument for col");
             }
         }
 
@@ -128,9 +127,9 @@ public class ArgumentsSeatAssignation{
             if(properties.containsKey(ORIGINAL_FLIGHT)){
 
                 this.originalFlight = properties.getProperty(ORIGINAL_FLIGHT);
-                //TODO seria newFlight? el orignal es el flight code que tenemos
+                //TODO seria newFlight? el original es el flight code que tenemos
             }else{
-                throw new InvalidArgumentException(new String[]{"Invalid argument for original flight"});
+                throw new IllegalArgumentException("Invalid argument for original flight");
             }
         }
     }

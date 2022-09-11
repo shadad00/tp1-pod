@@ -1,8 +1,9 @@
 package ar.edu.itba.models;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class CategorySeats {
+public class CategorySeats implements Serializable {
 
     private final CategoryDescription description;
     private final Ticket[][] ticketSeats;

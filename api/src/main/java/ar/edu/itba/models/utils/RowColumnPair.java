@@ -1,6 +1,8 @@
 package ar.edu.itba.models.utils;
 
-public class RowColumnPair {
+import java.io.Serializable;
+
+public class RowColumnPair implements Serializable {
     private Integer row;
     private Integer column;
 

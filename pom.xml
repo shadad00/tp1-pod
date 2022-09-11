@@ -16,6 +16,7 @@
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <slf4j.version>1.7.12</slf4j.version>
+      <jdk.version>1.8</jdk.version>
    </properties>
    <dependencyManagement>
       <dependencies>
@@ -88,8 +89,8 @@
             <version>3.10.1</version>
             <configuration>
                <verbose>false</verbose>
-               <source>11</source>
-               <target>11</target>
+               <source>8</source>
+               <target>8</target>
                <encoding>utf-8</encoding>
             </configuration>
          </plugin>

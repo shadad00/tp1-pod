@@ -24,9 +24,6 @@ public class SeatMapImpl implements SeatMap {
         this.flightCentral = flightCentral;
     }
 
-
-
-
     @Override
     public String getSeatMap(String flightCode) throws RemoteException {
         StringBuilder answer = new StringBuilder();

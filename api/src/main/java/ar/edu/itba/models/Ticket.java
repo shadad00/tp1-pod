@@ -9,6 +9,10 @@ public class Ticket implements Serializable {
     private SeatCategory category;
     private Seat seat;
 
+    public Ticket(String passenger, SeatCategory category) {
+        this.passenger = passenger;
+        this.category = category;
+    }
 
     public SeatCategory getCategory() {
         return category;

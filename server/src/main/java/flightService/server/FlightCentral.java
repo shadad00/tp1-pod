@@ -15,12 +15,20 @@ public class FlightCentral implements FlightMonitor{
     //modelos -> aviones
     private final Map<String, Plane> models;
 
-    private final FlightMonitor internalNotifier;
+    private  FlightMonitor internalNotifier;
 
     public FlightCentral() {
         flights = new HashMap<>();
         models = new HashMap<>();
-        internalNotifier =new FlightNotificationImpl(this); //register this to export
+    }
+
+    public void setNotificator(FlightMonitor monitor){
+        internalNotifier= monitor;
+    }
+
+
+    public FlightMonitor getFlightMonitor(){
+        return this.internalNotifier;
     }
 
     public Flight getFlight(String code){

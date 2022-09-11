@@ -1,8 +1,8 @@
 package flightService.client;
 
-import ar.edu.itba.Notifier;
 import ar.edu.itba.models.Flight;
 import ar.edu.itba.models.Seat;
+import ar.edu.itba.remoteInterfaces.Notifier;
 
 import java.rmi.RemoteException;
 

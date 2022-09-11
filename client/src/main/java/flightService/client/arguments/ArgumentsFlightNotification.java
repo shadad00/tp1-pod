@@ -1,6 +1,5 @@
 package flightService.client.arguments;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.util.Properties;
 
@@ -19,6 +18,16 @@ public class ArgumentsFlightNotification {
         return serverAddress;
     }
 
+    public Integer getPort(){
+        String[] strings = serverAddress.split(":");
+        return Integer.getInteger(strings[1]);
+    }
+
+    public String getAddress(){
+        String[] strings = serverAddress.split(":");
+        return strings[0];
+    }
+
     public String getPassenger() {
         return passenger;
     }
@@ -27,7 +36,7 @@ public class ArgumentsFlightNotification {
         return flightCode;
     }
 
-    public void parseArguments() throws InvalidArgumentException {
+    public void parseArguments() throws IllegalArgumentException {
 
         Properties properties = System.getProperties();
 
@@ -36,21 +45,21 @@ public class ArgumentsFlightNotification {
 
             this.serverAddress = properties.getProperty(SERVER);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for server address"});
+            throw new IllegalArgumentException("Invalid argument for server address");
         }
 
         if(properties.containsKey(PASSENGER)){
 
             this.passenger = properties.getProperty(PASSENGER);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for passenger"});
+            throw new IllegalArgumentException("Invalid argument for passenger");
         }
 
         if(properties.containsKey(FLIGHT)){
 
             this.flightCode = properties.getProperty(FLIGHT);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for flight"});
+            throw new IllegalArgumentException("Invalid argument for flight");
         }
 
     }

@@ -1,6 +1,5 @@
 package flightService.client.arguments;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.util.Properties;
 
@@ -24,6 +23,16 @@ public class ArgumentsSeatMap {
         return serverAddress;
     }
 
+    public Integer getPort(){
+        String[] strings = serverAddress.split(":");
+        return Integer.getInteger(strings[1]);
+    }
+
+    public String getAddress(){
+        String[] strings = serverAddress.split(":");
+        return strings[0];
+    }
+
     public String getFlightCode() {
         return flightCode;
     }
@@ -40,7 +49,7 @@ public class ArgumentsSeatMap {
         return outPath;
     }
 
-    public void parseArguments() throws InvalidArgumentException {
+    public void parseArguments() throws IllegalArgumentException {
 
         Properties properties = System.getProperties();
 
@@ -49,35 +58,35 @@ public class ArgumentsSeatMap {
 
             this.serverAddress = properties.getProperty(SERVER);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for server address"});
+            throw new IllegalArgumentException("Invalid argument for server address");
         }
 
         if(properties.containsKey(FLIGHT)){
 
             this.flightCode = properties.getProperty(FLIGHT);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for flight"});
+            throw new IllegalArgumentException("Invalid argument for flight");
         }
 
         if(properties.containsKey(ROW)){
 
             this.row = properties.getProperty(ROW);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for row"});
+            throw new IllegalArgumentException("Invalid argument for row");
         }
 
         if(properties.containsKey(OUT_PATH)){
 
             this.serverAddress = properties.getProperty(OUT_PATH);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for output path"});
+            throw new IllegalArgumentException("Invalid argument for output path");
         }
 
         if(properties.containsKey(CATEGORY)){
 
             this.serverAddress = properties.getProperty(CATEGORY);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for category"});
+            throw new IllegalArgumentException("Invalid argument for category");
         }
 
 

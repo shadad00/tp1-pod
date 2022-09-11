@@ -1,6 +1,8 @@
 package ar.edu.itba.models;
 
-public enum FlightStatus {
+import java.io.Serializable;
+
+public enum FlightStatus implements Serializable {
     PENDING,
     CONFIRMED,
     CANCELLED

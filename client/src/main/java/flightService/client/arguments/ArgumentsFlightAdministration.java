@@ -1,6 +1,5 @@
 package flightService.client.arguments;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.nio.file.Path;
 import java.util.Properties;
@@ -36,6 +35,8 @@ public class ArgumentsFlightAdministration {
     private String action;
     private String inPath;
     private String flightCode;
+    private String address;
+    private int port;
 
 
     private static final String SERVER="serverAddress";
@@ -49,13 +50,11 @@ public class ArgumentsFlightAdministration {
     }
 
     public Integer getPort(){
-        String[] strings = serverAddress.split(":");
-        return Integer.getInteger(strings[1]);
+        return port;
     }
 
     public String getAddress(){
-        String[] strings = serverAddress.split(":");
-        return strings[0];
+        return  address;
     }
 
     public String getAction() {
@@ -70,23 +69,30 @@ public class ArgumentsFlightAdministration {
         return flightCode;
     }
 
-    public void parseArguments() throws InvalidArgumentException{
+    public void parseArguments() throws IllegalArgumentException{
 
         Properties properties = System.getProperties();
 
+        this.serverAddress = properties.getProperty(SERVER);
+
+        String[] strings = serverAddress.split(":");
+        address = strings[0];
+        port = Integer.parseInt(strings[1]);
+
 
         if(properties.containsKey(SERVER)){
-
-            this.serverAddress = properties.getProperty(SERVER);
-        }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for server address"});
+            System.out.println("serverAddress: " + serverAddress);
+        }
+        else{
+            System.out.println("serverAddress not found");
+//            throw new IllegalArgumentException("Invalid argument for server address");
         }
 
         if(properties.containsKey(ACTION)){
 
             this.action = properties.getProperty(ACTION);
         }else{
-            throw new InvalidArgumentException(new String[]{"Invalid argument for action"});
+            throw new IllegalArgumentException("Invalid argument for action");
         }
 
         if(action.equals("flights") || action.equals("models")){
@@ -94,14 +100,14 @@ public class ArgumentsFlightAdministration {
 
                 this.inPath = properties.getProperty(IN_PATH);
             }else{
-                throw new InvalidArgumentException(new String[]{"Invalid argument for input path file"});
+                throw new IllegalArgumentException("Invalid argument for input path file");
             }
         }else if(action.equals("status") || action.equals("confirm") || action.equals("cancel")){
             if(properties.containsKey(FLIGHT)){
 
                 this.flightCode = properties.getProperty(FLIGHT);
             }else{
-                throw new InvalidArgumentException(new String[]{"Invalid argument for flight"});
+                throw new IllegalArgumentException("Invalid argument for flight");
             }
         }
     }

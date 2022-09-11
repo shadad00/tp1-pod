@@ -3,7 +3,6 @@ package servant;
 import ar.edu.itba.models.*;
 import ar.edu.itba.remoteInterfaces.SeatAssignation;
 import flightService.server.FlightCentral;
-import jdk.nashorn.internal.runtime.arrays.IntOrLongElements;
 
 import java.rmi.RemoteException;
 import java.util.Comparator;
