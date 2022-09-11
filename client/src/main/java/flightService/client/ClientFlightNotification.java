@@ -8,6 +8,7 @@ import flightService.client.arguments.ArgumentsFlightNotification;
 import flightService.client.arguments.ArgumentsSeatAssignation;
 
 import java.net.MalformedURLException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -32,10 +33,10 @@ public class ClientFlightNotification {
 
 
 
-            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
-
-            final FlightNotification service = (FlightNotification) registry.lookup(FlightNotification.class.getName());
-
+//            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
+//
+//            final FlightNotification service = (FlightNotification) registry.lookup(FlightNotification.class.getName());
+            final FlightNotification service = (FlightNotification) Naming.lookup("//" + clientArguments.getAddress() + "/" + FlightNotification.class.getName());
             service.registerUser(clientArguments.getFlightCode(), clientArguments.getPassenger(), notifier);//TODO Notifier
 
 
@@ -47,7 +48,7 @@ public class ClientFlightNotification {
 //        catch (MalformedURLException me) {
 //            System.out.println("ERROR: Malformed URL");
 //        }
-        catch (IllegalUserRegistration e) {
+        catch (IllegalUserRegistration | MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }

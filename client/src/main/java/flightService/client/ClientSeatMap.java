@@ -1,10 +1,13 @@
 package flightService.client;
 
 import ar.edu.itba.models.SeatCategory;
+import ar.edu.itba.remoteInterfaces.FlightNotification;
 import ar.edu.itba.remoteInterfaces.SeatMap;
 import flightService.client.arguments.ArgumentsSeatMap;
 
+import java.net.MalformedURLException;
 import java.rmi.AccessException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,10 +25,10 @@ public class ClientSeatMap {
                 System.out.println(e.getMessage());
             }
 
-            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
-
-            final SeatMap service = (SeatMap) registry.lookup(SeatMap.class.getName());
-
+//            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
+//
+//            final SeatMap service = (SeatMap) registry.lookup(SeatMap.class.getName());
+            final SeatMap service = (SeatMap) Naming.lookup("//" + clientArguments.getAddress() + "/" + SeatMap.class.getName());
             String category = clientArguments.getCategory();
 
             if (category != null) {
@@ -41,11 +44,7 @@ public class ClientSeatMap {
 
             service.getSeatMap(clientArguments.getFlightCode());
 
-        } catch (AccessException e) {
-            throw new RuntimeException(e);
-        } catch (NotBoundException e) {
-            throw new RuntimeException(e);
-        } catch (RemoteException e) {
+        } catch (NotBoundException | RemoteException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
