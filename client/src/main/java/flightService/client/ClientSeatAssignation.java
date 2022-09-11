@@ -1,5 +1,6 @@
 package flightService.client;
 
+import ar.edu.itba.remoteInterfaces.FlightAdministration;
 import ar.edu.itba.remoteInterfaces.SeatAssignation;
 import flightService.client.arguments.ArgumentsSeatAssignation;
 
@@ -25,11 +26,9 @@ public class ClientSeatAssignation {
                 System.out.println(e.getMessage());
             }
 
-            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
-
-
-
-            final SeatAssignation service = (SeatAssignation) registry.lookup(SeatAssignation.class.getName());
+//            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
+//            final SeatAssignation service = (SeatAssignation) registry.lookup(SeatAssignation.class.getName());
+            final SeatAssignation service = (SeatAssignation) Naming.lookup("//" + clientArguments.getAddress() + "/" + SeatAssignation.class.getName());
 
             String action = clientArguments.getAction();
 
@@ -55,6 +54,8 @@ public class ClientSeatAssignation {
             System.out.println("ERROR: Exception in the remote server");
         } catch (NotBoundException nbe) {
             System.out.println("ERROR: Service not bound");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         }
 //        catch (MalformedURLException me) {
 //            System.out.println("ERROR: Malformed URL");

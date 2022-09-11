@@ -1,5 +1,6 @@
 package flightService.server;
 
+import ar.edu.itba.models.Flight;
 import ar.edu.itba.remoteInterfaces.FlightAdministration;
 import ar.edu.itba.remoteInterfaces.FlightNotification;
 import ar.edu.itba.remoteInterfaces.SeatAssignation;
@@ -31,15 +32,15 @@ public class Server {
         SeatMap seatMap = new SeatMapImpl(flightCentral);
 
         final Remote remoteNotification = UnicastRemoteObject.exportObject(flightNotification,0);
-        final Remote remoteAdministration = UnicastRemoteObject.exportObject(flightAdministration,9999);
+        final Remote remoteAdministration = UnicastRemoteObject.exportObject(flightAdministration,0);
         final Remote remoteAssignation = UnicastRemoteObject.exportObject(seatAssignation,0);
         final Remote remoteMap = UnicastRemoteObject.exportObject(seatMap,0);
 
         final Registry registry = LocateRegistry.getRegistry();
-        registry.bind(FlightNotification.class.getName(),remoteNotification);
-        registry.bind(FlightAdministration.class.getName(),remoteAdministration);
-        registry.bind( SeatAssignation.class.getName(),remoteAssignation);
-        registry.bind(SeatMap.class.getName(),remoteMap);
+        registry.rebind(FlightNotification.class.getName(),remoteNotification);
+        registry.rebind(FlightAdministration.class.getName(),remoteAdministration);
+        registry.rebind( SeatAssignation.class.getName(),remoteAssignation);
+        registry.rebind(SeatMap.class.getName(),remoteMap);
 
         logger.info("Services Exposed");
 

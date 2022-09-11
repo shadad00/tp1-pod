@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -32,31 +33,34 @@ public class ClientFlightAdministration {
                 System.out.println(e.getMessage());
             }
 
-            if (clientArguments != null) {
-                System.out.println(clientArguments.getAddress() + "adress not null");
-            }
-            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
-
-            final FlightAdministration service = (FlightAdministration) registry.lookup(FlightAdministration.class.getName());
+//            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
+            final FlightAdministration service = (FlightAdministration) Naming.lookup("//" + clientArguments.getAddress() + "/" + FlightAdministration.class.getName());
+//            final FlightAdministration service = (FlightAdministration) registry.lookup("123");
 
             String action = clientArguments.getAction();
-            List<String> file = Files.readAllLines(Paths.get(clientArguments.getInPath()) );
 
             switch (action) {
                 case "models":
-                    parseModelsFile(file, service);
+                    List<String> models = Files.readAllLines(Paths.get(clientArguments.getInPath()) );
+                    models.remove(0); //Ignores header of CSV file
+                    parseModelsFile(models, service);
                     break;
                 case "flights":
-                    parseFlightsFile(file, service);
+                    List<String> flights = Files.readAllLines(Paths.get(clientArguments.getInPath()) );
+                    flights.remove(0); //Ignores header of CSV file
+                    parseFlightsFile(flights, service);
                     break;
                 case "status":
-                    service.getFlightStatus(clientArguments.getFlightCode());
+                    System.out.println("Flight " + clientArguments.getFlightCode()  + " is " +
+                            service.getFlightStatus(clientArguments.getFlightCode()));
                     break;
                 case "confirm":
                     service.confirmFlight(clientArguments.getFlightCode());
+                    System.out.println("Flight" + clientArguments.getFlightCode()  + "is confirmed");
                     break;
                 case "cancel":
                     service.cancelFlight(clientArguments.getFlightCode());
+                    System.out.println("Flight" + clientArguments.getFlightCode()  + "is cancelled");
                     break;
                 case "retticketing":
                     service.forceTicketChangeForCancelledFlights();
@@ -80,6 +84,7 @@ public class ClientFlightAdministration {
             String[] parse = line.split(";");
             EnumMap<SeatCategory, RowColumnPair> seats = parseModels(parse[1]);
             service.addPlaneModel(parse[0], seats);
+
         }
 
         System.out.println(file.size() + " models registered\n");

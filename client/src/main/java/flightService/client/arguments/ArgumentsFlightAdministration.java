@@ -73,19 +73,19 @@ public class ArgumentsFlightAdministration {
 
         Properties properties = System.getProperties();
 
-        this.serverAddress = properties.getProperty(SERVER);
 
-        String[] strings = serverAddress.split(":");
-        address = strings[0];
-        port = Integer.parseInt(strings[1]);
 
 
         if(properties.containsKey(SERVER)){
-            System.out.println("serverAddress: " + serverAddress);
+            this.serverAddress = properties.getProperty(SERVER);
+
+            String[] strings = serverAddress.split(":");
+            address = strings[0];
+            port = Integer.parseInt(strings[1]);
         }
         else{
-            System.out.println("serverAddress not found");
-//            throw new IllegalArgumentException("Invalid argument for server address");
+//            System.out.println("serverAddress not found");
+            throw new IllegalArgumentException("Invalid argument for server address");
         }
 
         if(properties.containsKey(ACTION)){

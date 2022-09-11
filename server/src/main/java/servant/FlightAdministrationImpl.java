@@ -20,8 +20,10 @@ public class FlightAdministrationImpl implements FlightAdministration {
     @Override
     public void addPlaneModel(String model, EnumMap<SeatCategory, RowColumnPair> categories) throws RemoteException {
 
-        if(flightCentral.getModels(model) != null)
+        if(flightCentral.getModels(model) != null) {
+            System.out.println("Model already exists");
             throw new IllegalArgumentException();
+        }
 
         EnumMap<SeatCategory, CategoryDescription> categoryDescriptors = new EnumMap<>(SeatCategory.class);
 
@@ -29,14 +31,16 @@ public class FlightAdministrationImpl implements FlightAdministration {
         for (SeatCategory category : SeatCategory.values()
              ) {
             RowColumnPair pair = categories.get(category);
-            if(pair.getRow() > 0 && pair.getColumn() > 0) {
+            if(pair != null && pair.getRow() > 0 && pair.getColumn() > 0) {
                 categoryDescriptors.put(category, new CategoryDescription(category, totalRows+1, totalRows + pair.getRow(), pair.getColumn()));
                 totalRows += pair.getRow();
             }
         }
 
-        if(totalRows <= 0)
+        if(totalRows <= 0) {
+            System.out.println("Invalid rows and columns");
             throw new IllegalArgumentException();
+        }
 
         flightCentral.addModel(model, new Plane(model, categoryDescriptors));
 
@@ -45,8 +49,10 @@ public class FlightAdministrationImpl implements FlightAdministration {
     @Override
     public void addFlight(String modelName, String flightCode, String destinationAirportCode, Map<String, Ticket> tickets) throws RemoteException {
         if(!flightCentral.modelExists(modelName)
-                || flightCentral.flightExists(flightCode) )
+                || flightCentral.flightExists(flightCode) ){
+            System.out.println("model or flight already exists " + modelName + " " + flightCode);
             throw new IllegalArgumentException();
+        }
 
         flightCentral.addFlight(flightCode, new Flight(flightCode, destinationAirportCode, flightCentral.getModels(modelName), tickets));
 
