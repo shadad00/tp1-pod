@@ -51,7 +51,7 @@ public class ClientSeatAssignation {
                     System.out.println(service.checkAlternativeFlights(clientArguments.getFlightCode(), clientArguments.getPassenger()));
                     break;
                 case "changeTicket":
-                    service.changeTicket(clientArguments.getPassenger(), clientArguments.getFlightCode(), clientArguments.getOriginalFlight());
+                    service.changeTicket(clientArguments.getPassenger(), clientArguments.getOriginalFlight(), clientArguments.getFlightCode());
                     break;
             }
 

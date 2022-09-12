@@ -74,7 +74,6 @@ public class SeatAssignationImpl implements SeatAssignation {
 
         List<AlternativeFlight> alternativeFlights = new ArrayList<>();
 
-        System.out.println(flights.get(0).getFlightCode());
         for (Flight f : flights) {
             int cant;
             for (SeatCategory category : SeatCategory.values()) {
@@ -84,7 +83,6 @@ public class SeatAssignationImpl implements SeatAssignation {
             }
         }
 
-        System.out.println(alternativeFlights);
         StringBuilder stringBuilder = new StringBuilder();
         alternativeFlights.stream().sorted().forEach(stringBuilder::append);
         return stringBuilder.toString();
@@ -93,13 +91,16 @@ public class SeatAssignationImpl implements SeatAssignation {
 
     @Override
     public void changeTicket(String passenger, String oldFlightCode, String newFlightCode) throws RemoteException {
+        System.out.println("old " + oldFlightCode);
+        System.out.println("new:"  +newFlightCode);
+        System.out.println("passenger " + passenger);
         Flight oldFlight = Optional.ofNullable(flightCentral.getFlight(oldFlightCode))
-                .orElseThrow(RemoteException::new);
+                .orElseThrow(IllegalArgumentException::new);
         if(oldFlight.getFlightStatus().equals(FlightStatus.CONFIRMED)
                 || !oldFlight.passengerExists(passenger))
             throw new IllegalArgumentException();
         Flight newFlight = Optional.ofNullable(flightCentral.getFlight(newFlightCode))
-                .orElseThrow(RemoteException::new);
+                .orElseThrow(IllegalArgumentException::new);
         Ticket oldTicket = oldFlight.getTicket(passenger);
         List<Flight> alternativeFlights = flightCentral
                 .getAlternativeFlights( oldTicket.getCategory(), oldFlight.getDestiny(),oldFlightCode);
