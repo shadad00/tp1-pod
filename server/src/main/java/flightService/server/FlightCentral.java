@@ -32,43 +32,60 @@ public class FlightCentral implements FlightMonitor{
     }
 
     public Flight getFlight(String code){
-        return flights.get(code);
+        synchronized (flights) {
+            return flights.get(code);
+        }
     }
 
     public Map<String, Flight> getFlights() {
-        return flights;
+        synchronized (flights) {
+            return flights;
+        }
     }
 
     public Plane getModels(String model) {
-        return models.get(model);
+        synchronized (models) {
+            return models.get(model);
+        }
     }
 
     public Flight addFlight(String flightCode, Flight newFlight){
-        return flights.putIfAbsent(flightCode,newFlight);
+        synchronized (flights) {
+            return flights.putIfAbsent(flightCode, newFlight);
+        }
     }
 
 
     public Plane addModel(String modelName, Plane plane){
-        return models.putIfAbsent(modelName,plane);
+        synchronized (models) {
+            return models.putIfAbsent(modelName, plane);
+        }
     }
 
     public boolean flightExists(String flightCode){
-        return flights.containsKey(flightCode);
+        synchronized (flights) {
+            return flights.containsKey(flightCode);
+        }
     }
 
     public boolean modelExists(String model){
-        return models.containsKey(model);
+        synchronized (models) {
+            return models.containsKey(model);
+        }
     }
 
 
     public List<Flight> getAlternativeFlights(SeatCategory category, String destiny){
-            return this.flights.values().stream()
-                .filter(
-                        flight -> flight.getStatus().equals(FlightStatus.PENDING)
-                                && flight.getDestiny().equals(destiny)
-                                && flight.hasAvailableSeatsForCategoryOrLower(category)).collect(Collectors.toList());
+        synchronized (flights) {
+            return flights.values().stream()
+                    .filter(
+                            flight -> flight.getStatus().equals(FlightStatus.PENDING)
+                                    && flight.getDestiny().equals(destiny)
+                                    && flight.hasAvailableSeatsForCategoryOrLower(category)).collect(Collectors.toList());
+        }
     }
 
+    //TODO: chequear si están bien sincronizadas las notifications
     public void notifyConfirmation(Flight flight){
         internalNotifier.notifyConfirmation(flight);
     }

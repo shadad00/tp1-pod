@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class FlightAdministrationImpl implements FlightAdministration {
 
-    private FlightCentral flightCentral;
+    private final FlightCentral flightCentral;
 
     public FlightAdministrationImpl(FlightCentral flightCentral){
         this.flightCentral=flightCentral;
