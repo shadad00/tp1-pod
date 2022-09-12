@@ -1,9 +1,6 @@
 package ar.edu.itba.remoteInterfaces;
 
 import ar.edu.itba.models.Flight;
-import ar.edu.itba.models.Passenger;
-import ar.edu.itba.models.Seat;
-import ar.edu.itba.models.Ticket;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -14,13 +11,14 @@ public interface SeatAssignation extends Remote {
     /**
      * Consultar si un asiento está libre u ocupado a partir del código de vuelo,
      * el número de la fila y la letra de la columna del asiento
+     *
      * @param flightCode
      * @param row
      * @param col
      * @return
      * @throws RemoteException
      */
-    boolean isSeatFree(String flightCode, Integer row, Character col) throws RemoteException;
+    String isSeatFree(String flightCode, Integer row, Character col) throws RemoteException;
 
     /**
      * Asignar un asiento libre a un pasajero a partir del código de vuelo y el número de la fila

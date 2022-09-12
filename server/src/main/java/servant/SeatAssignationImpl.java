@@ -21,7 +21,7 @@ public class SeatAssignationImpl implements SeatAssignation {
 
 
     @Override
-    public boolean isSeatFree(String flightCode, Integer row, Character col) throws RemoteException {
+    public String isSeatFree(String flightCode, Integer row, Character col) throws RemoteException {
         return flightCentral.getFlight(flightCode).isSeatAvailable(row, fromColumnCharacter(col));
     }
 
@@ -47,13 +47,16 @@ public class SeatAssignationImpl implements SeatAssignation {
 
     @Override
     public void movePassenger(String flightCode, String passenger, Integer row, Character col) throws RemoteException {
-        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
-        Ticket passengerTicket = flight.getTicket(passenger);
+        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
+        Ticket passengerTicket = Optional.ofNullable(flight.getTicket(passenger)).orElseThrow(IllegalArgumentException::new);
         Seat oldSeat = passengerTicket.getSeat();
+
+        if(flight.isSeatAvailable(row, fromColumnCharacter(col)) != null)
+            throw new IllegalArgumentException("New seat is already taken.");
+        
         flight.freePassengerSeat(passenger);
-        if( assignSeatPrivate(flightCode, passenger, row, fromColumnCharacter(col) ) )
-            flightCentral.notifySeatChange(passenger,oldSeat,flight);
-        else passengerTicket.assignSeat(oldSeat); //rollback
+        assignSeatPrivate(flightCode, passenger, row, fromColumnCharacter(col) );
+        flightCentral.notifySeatChange(passenger,oldSeat,flight);
     }
 
     @Override

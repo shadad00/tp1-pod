@@ -76,11 +76,10 @@ public class Flight implements Serializable {
         return null;
     }
 
-    public boolean isSeatAvailable(Integer row, Integer col){
+    public String isSeatAvailable(Integer row, Integer col){
         for(CategorySeats seats: categorySeats.values()){
             if(seats.contains(row, col)) {
-                System.out.println("Hola");
-                return seats.isSeatAvailable(row, col);
+                return seats.getPassengerFromSeat(row, col);
             }
         }
         throw new IllegalArgumentException("Seat does not exist");
@@ -108,17 +107,20 @@ public class Flight implements Serializable {
         if((ticket=Optional.ofNullable(tickets.get(passenger)).orElseThrow(IllegalArgumentException::new)).getSeat() != null)
             return false; //el pasajero ya tiene un asiento en el vuelo
 
-        for(Map.Entry<SeatCategory, CategorySeats> entry: categorySeats.entrySet())
-            if (entry.getKey().ordinal() >= ticket.getCategory().ordinal() && entry.getValue().assignSeat(row, col,ticket) != null){
-                return true;
+        for(Map.Entry<SeatCategory, CategorySeats> entry: categorySeats.entrySet()) {
+            // si el asiento es de menor o igual categoria que la del ticket comprado
+            if (entry.getKey().ordinal() >= ticket.getCategory().ordinal() && entry.getValue().contains(row, col)) {
+                return entry.getValue().assignSeat(row, col, ticket) != null;
             }
+        }
         return false;
     }
 
     public void freePassengerSeat(String passengerName){
         Ticket ticket = tickets.get(passengerName);
         if(ticket.hasSeat()){
-            categorySeats.get(ticket.getCategory()).freeSeat(ticket.getSeat().getRow(), ticket.getSeat().getColumn());
+            categorySeats.get( ticket.getSeat().getCategory() )
+                    .freeSeat(ticket.getSeat().getRow(), ticket.getSeat().getColumn());
             ticket.clearSeat();
         }
 

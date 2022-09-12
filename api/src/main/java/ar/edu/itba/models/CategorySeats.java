@@ -50,9 +50,16 @@ public class CategorySeats implements Serializable {
     public boolean isSeatAvailable(Integer row, Integer col){
         if(!contains(row, col))
             throw new IllegalArgumentException();
-
         return ticketSeats[getRealRowIndex(row)][col]==null;
     }
+
+    public String getPassengerFromSeat(Integer row, Integer col){
+        if(!contains(row, col))
+            throw new IllegalArgumentException();
+        return ticketSeats[getRealRowIndex(row)][col]==null ?
+                null : ticketSeats[getRealRowIndex(row)][col].getPassenger();
+    }
+
 
     public Ticket assignSeat(Integer row, Integer col,Ticket ticket){
         if(!contains(row, col))
@@ -61,13 +68,13 @@ public class CategorySeats implements Serializable {
         // trato de asignarle el asiento pedido
         if (isSeatAvailable(row, col)) {
             int newRow = getRealRowIndex(row);
-            ticket.assignSeat(new Seat(newRow,col,ticket.getCategory()));
+            ticket.assignSeat(new Seat(row,col,description.getCategory()));
             ticketSeats[newRow][col] = ticket;
             return ticketSeats[newRow][col];
         }
 
         // trato de asignarle un asiento libre de esta categoria
-        for (int i = 0; i < ticketSeats.length; i++) {
+        /*for (int i = 0; i < ticketSeats.length; i++) {
             for (int j = 0; j < ticketSeats[0].length; j++) {
                 if (isSeatAvailable(i, j)) {
                     ticket.assignSeat(new Seat(i,j,ticket.getCategory()));
@@ -77,7 +84,7 @@ public class CategorySeats implements Serializable {
 
             }
 
-        }
+        }*/
         return null;
     }
 
