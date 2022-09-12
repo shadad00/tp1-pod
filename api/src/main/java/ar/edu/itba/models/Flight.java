@@ -78,10 +78,10 @@ public class Flight implements Serializable {
     public SeatCategory getBestAvailableCategory(SeatCategory category){
         SeatCategory[] categories = SeatCategory.values();
         for (int i = category.ordinal(); i < SeatCategory.values().length; i++) {
-            if(categorySeats.get(categories[i]).getAvailableSeats() > 0 )
+            if(categorySeats.get(categories[i])!=null && categorySeats.get(categories[i]).getAvailableSeats() > 0 )
                 return SeatCategory.values()[i];
         }
-        return null;
+        return SeatCategory.ECONOMY;
     }
 
     public String isSeatAvailable(Integer row, Integer col){

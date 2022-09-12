@@ -104,4 +104,28 @@ public class FlightCentral implements FlightMonitor{
         internalNotifier.notifyFlightChange(passenger, oldFlight, newFlight);
     }
 
+    public List<AlternativeFlight> getAlternatives(String flightCode, String passenger){
+        Flight flight = Optional.ofNullable(getFlight(flightCode))
+                .orElseThrow(IllegalArgumentException::new);
+
+        if(flight.getFlightStatus().equals(FlightStatus.CONFIRMED))
+            throw new IllegalArgumentException();
+
+        Ticket ticket = Optional.ofNullable(flight.getTicket(passenger))
+                .orElseThrow(IllegalArgumentException::new);
+
+        List<Flight> flights =  getAlternativeFlights( ticket.getCategory(), flight.getDestiny(),flightCode);
+
+        List<AlternativeFlight> alternativeFlights = new ArrayList<>();
+
+        for (Flight f : flights) {
+            int cant;
+            for (SeatCategory category : SeatCategory.values()) {
+                if( (cant=f.getFreeFromCategory(category) ) >0) {
+                    alternativeFlights.add(new AlternativeFlight(cant, category, f.getFlightCode(), f.getDestiny()));
+                }
+            }
+        }
+        return alternativeFlights;
+    }
 }

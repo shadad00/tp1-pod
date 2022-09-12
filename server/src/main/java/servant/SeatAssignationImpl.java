@@ -61,33 +61,17 @@ public class SeatAssignationImpl implements SeatAssignation {
 
     @Override
     public String checkAlternativeFlights(String flightCode, String passenger) throws RemoteException {
-        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode))
-                .orElseThrow(IllegalArgumentException::new);
 
-        if(flight.getFlightStatus().equals(FlightStatus.CONFIRMED))
-            throw new IllegalArgumentException();
-
-        Ticket ticket = Optional.ofNullable(flight.getTicket(passenger))
-                .orElseThrow(IllegalArgumentException::new);
-
-        List<Flight> flights =  flightCentral.getAlternativeFlights( ticket.getCategory(), flight.getDestiny(),flightCode);
-
-        List<AlternativeFlight> alternativeFlights = new ArrayList<>();
-
-        for (Flight f : flights) {
-            int cant;
-            for (SeatCategory category : SeatCategory.values()) {
-                if( (cant=f.getFreeFromCategory(category) ) >0) {
-                    alternativeFlights.add(new AlternativeFlight(cant, category, f.getFlightCode(), f.getDestiny()));
-                }
-            }
-        }
+        List<AlternativeFlight> alternativeFlights = flightCentral.getAlternatives(flightCode, passenger);
 
         StringBuilder stringBuilder = new StringBuilder();
         alternativeFlights.stream().sorted().forEach(stringBuilder::append);
         return stringBuilder.toString();
 
-    }
+      }
+
+
+
 
     @Override
     public void changeTicket(String passenger, String oldFlightCode, String newFlightCode) throws RemoteException {
@@ -114,5 +98,7 @@ public class SeatAssignationImpl implements SeatAssignation {
     private int fromColumnCharacter(Character column){
         return column - 'A';
     }
+
+
 
 }

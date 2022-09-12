@@ -27,7 +27,7 @@ public class Plane implements Serializable {
     public boolean seatExists(int row, int col){
         int totalRows;
         for (SeatCategory category : SeatCategory.values()) {
-            if(categoryRows.get(category).contains(row, col))
+            if(categoryRows.get(category)!=null && categoryRows.get(category).contains(row, col))
                 return true;
         }
         return false;

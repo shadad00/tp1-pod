@@ -1,6 +1,7 @@
 package servant;
 
 import ar.edu.itba.models.*;
+import ar.edu.itba.models.utils.AlternativeFlight;
 import ar.edu.itba.models.utils.RowColumnPair;
 import ar.edu.itba.remoteInterfaces.FlightAdministration;
 import flightService.server.FlightCentral;
@@ -93,20 +94,29 @@ public class FlightAdministrationImpl implements FlightAdministration {
                         .forEach(
                         ticket -> {
 
-                            List<Flight> alternatives = getAlternatives(ticket, oldFlight.getDestiny(),oldFlight.getFlightCode());
+                            getAlternatives(ticket, oldFlight.getDestiny(), oldFlight.getFlightCode()).stream()
+                                    .filter(flight -> flight.getAvailableSeats() > 0)
+                                    .max(Comparator.comparing(
+                                            (Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
+                                    .thenComparingInt(Flight::getAvailableSeats).reversed()
+                                    .thenComparing(Flight::getFlightCode))
+                                    .ifPresent( alternative -> {
+                                        ticket.clearSeat();
+                                        alternative.addTicket(ticket);
+                                        System.out.println("Moving" + ticket.getPassenger()+" to "+alternative.getFlightCode());
+                                    });
 
-                            if(!alternatives.isEmpty()){
-                                Optional<Flight> maybeNewFlight = alternatives.stream()
-                                        .min(Comparator.comparing((Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
-                                        .thenComparingInt(Flight::getAvailableSeats).reversed()
-                                        .thenComparing(Flight::getFlightCode));
-                                maybeNewFlight.ifPresent(newFlight -> {
-                                    ticket.clearSeat();
-                                    newFlight.addTicket(ticket);
-                                    //todo: remove ticket from oldFlight ?
-                                    //todo: notify service ?
-                                });
-                            }
+
+//                                Optional<Flight> maybeNewFlight = alternatives.stream()
+//                                        .min(Comparator.comparing((Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
+//                                        .thenComparingInt(Flight::getAvailableSeats).reversed()
+//                                        .thenComparing(Flight::getFlightCode));
+//                                maybeNewFlight.ifPresent(newFlight -> {
+//                                    ticket.clearSeat();
+//                                    newFlight.addTicket(ticket);
+//                                    //todo: remove ticket from oldFlight ?
+//                                    //todo: notify service ?
+//                                });
 
                         }
                 )
