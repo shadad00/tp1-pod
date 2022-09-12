@@ -19,7 +19,9 @@ public class Flight implements Serializable {
 
         this.categorySeats = new EnumMap<>(SeatCategory.class);
         for (SeatCategory value : SeatCategory.values()) {
-            this.categorySeats.put(value, new CategorySeats(plane.getCategoryDescription(value)));
+            CategoryDescription categoryDescription = plane.getCategoryDescription(value);
+            if(categoryDescription != null)
+                categorySeats.put(value, new CategorySeats(categoryDescription));
         }
 
         this.tickets = tickets;
@@ -76,10 +78,12 @@ public class Flight implements Serializable {
 
     public boolean isSeatAvailable(Integer row, Integer col){
         for(CategorySeats seats: categorySeats.values()){
-            if(seats.contains(row, col))
+            if(seats.contains(row, col)) {
+                System.out.println("Hola");
                 return seats.isSeatAvailable(row, col);
+            }
         }
-        return false;
+        throw new IllegalArgumentException("Seat does not exist");
     }
 
     public int getAvailableSeats(){
@@ -105,7 +109,7 @@ public class Flight implements Serializable {
             return false; //el pasajero ya tiene un asiento en el vuelo
 
         for(Map.Entry<SeatCategory, CategorySeats> entry: categorySeats.entrySet())
-            if (entry.getKey().ordinal() <= ticket.getCategory().ordinal() && entry.getValue().assignSeat(row, col,ticket) != null){
+            if (entry.getKey().ordinal() >= ticket.getCategory().ordinal() && entry.getValue().assignSeat(row, col,ticket) != null){
                 return true;
             }
         return false;

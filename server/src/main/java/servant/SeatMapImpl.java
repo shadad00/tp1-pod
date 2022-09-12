@@ -28,6 +28,7 @@ public class SeatMapImpl implements SeatMap {
     public String getSeatMap(String flightCode) throws RemoteException {
         StringBuilder answer = new StringBuilder();
         for(SeatCategory category : SeatCategory.values()){
+
             answer.append(getSeatMapByCategory(flightCode,category));
         }
         return answer.toString();
@@ -38,9 +39,12 @@ public class SeatMapImpl implements SeatMap {
         Flight flight = Optional.ofNullable(this.flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
         StringBuilder answer = new StringBuilder();
         CategorySeats categorySeats = flight.getCategorySeats(category);
-        for(int i = 0 ; i < categorySeats.getNrows(); i++){
-            answer.append(getSeatMapByRowWithCategory(flight,categorySeats.getFromRow()+i,category));
+        if (categorySeats != null) {
+            for(int i = 0 ; i < categorySeats.getNrows(); i++){
+                answer.append(getSeatMapByRowWithCategory(flight,categorySeats.getFromRow()+i,category));
+            }
         }
+
         return answer.toString();
     }
 
@@ -59,9 +63,11 @@ public class SeatMapImpl implements SeatMap {
         if(category == null)
             return "";
         StringBuilder stringBuilder = new StringBuilder();
-        int col = 0;
+        String rowString = String.format("%02d",rowNumber);
+        char col = 0;
         for (Ticket ticket : row) {
-            stringBuilder.append("| ").append(rowNumber).append(' ').append('A' + col).append(' ').append(ticket!=null? ticket.getPassenger().charAt(0) : '*').append(" |");
+            stringBuilder.append("| ").append(rowString).append(' ').append((char)('A' + col)).append(' ').append(ticket!=null? ticket.getPassenger().charAt(0) : '*').append(" |");
+            col++;
         }
         stringBuilder.append("\t").append(category.name()).append('\n');
         return stringBuilder.toString();

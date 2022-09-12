@@ -37,7 +37,11 @@ public class ClientSeatAssignation {
                     service.assignSeat(clientArguments.getFlightCode(), clientArguments.getPassenger(), clientArguments.getRow(), clientArguments.getCol());
                     break;
                 case "status":
-                    service.isSeatFree(clientArguments.getFlightCode(), clientArguments.getRow(), clientArguments.getCol());
+                    if (service.isSeatFree(clientArguments.getFlightCode(), clientArguments.getRow(), clientArguments.getCol()))
+                        System.out.printf("seat %d%c is free\n%n",clientArguments.getRow(),clientArguments.getCol() );
+                    else
+                        System.out.printf("seat %d%c is assigned to: \n%n",clientArguments.getRow(),clientArguments.getCol() );
+
                     break;
                 case "move":
                     service.movePassenger(clientArguments.getFlightCode(), clientArguments.getPassenger(), clientArguments.getRow(), clientArguments.getCol());

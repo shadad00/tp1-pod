@@ -32,14 +32,21 @@ public class CategoryDescription implements Serializable {
     }
 
     public boolean contains(Integer row, Integer column){
-        return row >= fromRow && row <= toRow && column > 0 && column < columnsNumber;
+        if(row==null || column == null)
+            throw new IllegalArgumentException();
+
+        return row >= fromRow && row <= toRow && column >= 0 && column < columnsNumber;
     }
 
     public boolean containsRow(Integer row){
+        if(row == null)
+            throw new IllegalArgumentException();
         return row >= fromRow && row <= toRow;
     }
 
     public boolean containsColumn(Integer column){
+        if(column == null)
+            throw new IllegalArgumentException();
         return column > 0 && column < columnsNumber;
     }
 

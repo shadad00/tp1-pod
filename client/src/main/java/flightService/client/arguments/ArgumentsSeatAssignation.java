@@ -109,15 +109,13 @@ public class ArgumentsSeatAssignation{
 
         if(action.equals("assign") || action.equals("move") || action.equals("status")){
             if(properties.containsKey(ROW)){
-
-                this.row = Integer.getInteger(properties.getProperty(ROW));
+                this.row = Integer.parseInt(properties.getProperty(ROW));
             }else{
                 throw new IllegalArgumentException("Invalid argument for row");
             }
 
             if(properties.containsKey(COL)){
-
-                this.col = (char) (properties.getProperty(COL).charAt(0) - 'A' + 1);
+                this.col = properties.getProperty(COL).charAt(0);
             }else{
                 throw new IllegalArgumentException("Invalid argument for col");
             }

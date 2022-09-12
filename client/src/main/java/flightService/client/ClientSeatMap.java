@@ -42,7 +42,7 @@ public class ClientSeatMap {
             }
 
 
-            service.getSeatMap(clientArguments.getFlightCode());
+            System.out.println(service.getSeatMap(clientArguments.getFlightCode()));
 
         } catch (NotBoundException | RemoteException | MalformedURLException e) {
             throw new RuntimeException(e);

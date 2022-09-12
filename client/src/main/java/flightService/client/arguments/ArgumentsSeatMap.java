@@ -9,7 +9,8 @@ public class ArgumentsSeatMap {
     private String category;
     private String row;
     private String outPath;
-
+    private String address;
+    private int port;
 
 
     private static final String SERVER="serverAddress";
@@ -24,13 +25,11 @@ public class ArgumentsSeatMap {
     }
 
     public Integer getPort(){
-        String[] strings = serverAddress.split(":");
-        return Integer.getInteger(strings[1]);
+        return port;
     }
 
     public String getAddress(){
-        String[] strings = serverAddress.split(":");
-        return strings[0];
+        return address;
     }
 
     public String getFlightCode() {
@@ -55,8 +54,11 @@ public class ArgumentsSeatMap {
 
 
         if(properties.containsKey(SERVER)){
-
             this.serverAddress = properties.getProperty(SERVER);
+
+            String[] strings = serverAddress.split(":");
+            address = strings[0];
+            port = Integer.parseInt(strings[1]);
         }else{
             throw new IllegalArgumentException("Invalid argument for server address");
         }
@@ -71,23 +73,27 @@ public class ArgumentsSeatMap {
         if(properties.containsKey(ROW)){
 
             this.row = properties.getProperty(ROW);
-        }else{
-            throw new IllegalArgumentException("Invalid argument for row");
         }
+//        else{
+//            throw new IllegalArgumentException("Invalid argument for row");
+//        }
 
         if(properties.containsKey(OUT_PATH)){
 
             this.serverAddress = properties.getProperty(OUT_PATH);
-        }else{
-            throw new IllegalArgumentException("Invalid argument for output path");
         }
+//        else{
+//            throw new IllegalArgumentException("Invalid argument for output path");
+//        }
+        //TODO: add outPath
 
         if(properties.containsKey(CATEGORY)){
 
             this.serverAddress = properties.getProperty(CATEGORY);
-        }else{
-            throw new IllegalArgumentException("Invalid argument for category");
         }
+//        else{
+//            throw new IllegalArgumentException("Invalid argument for category");
+//        }
 
 
     }
