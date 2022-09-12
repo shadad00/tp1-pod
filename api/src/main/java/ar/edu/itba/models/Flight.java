@@ -33,7 +33,7 @@ public class Flight implements Serializable {
 
     public SeatCategory getCategoryFromRow(int row){
         for (SeatCategory category : SeatCategory.values()) {
-            if(categorySeats.get(category).containsRow(row))
+            if(categorySeats.get(category) != null && categorySeats.get(category).containsRow(row))
                 return category;
         }
         return null;

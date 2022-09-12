@@ -29,20 +29,22 @@ public class ClientSeatMap {
 //
 //            final SeatMap service = (SeatMap) registry.lookup(SeatMap.class.getName());
             final SeatMap service = (SeatMap) Naming.lookup("//" + clientArguments.getAddress() + "/" + SeatMap.class.getName());
+
             String category = clientArguments.getCategory();
-
-            if (category != null) {
-                service.getSeatMapByCategory(clientArguments.getFlightCode(), SeatCategory.valueOf(category));
-            }
-
             String row = clientArguments.getRow();
-
-            if (row != null) {
-                service.getSeatMapByRow(clientArguments.getFlightCode(), Integer.parseInt(row));
+            String output;
+            if (category != null) {
+                 output = service.getSeatMapByCategory(clientArguments.getFlightCode(), SeatCategory.valueOf(category));
+            }
+            else if (row != null) {
+                output = service.getSeatMapByRow(clientArguments.getFlightCode(), Integer.parseInt(row));
+            }
+            else {
+                output = service.getSeatMap(clientArguments.getFlightCode());
             }
 
 
-            System.out.println(service.getSeatMap(clientArguments.getFlightCode()));
+            System.out.println(output);
 
         } catch (NotBoundException | RemoteException | MalformedURLException e) {
             throw new RuntimeException(e);

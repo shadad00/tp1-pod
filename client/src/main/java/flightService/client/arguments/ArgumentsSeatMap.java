@@ -80,7 +80,7 @@ public class ArgumentsSeatMap {
 
         if(properties.containsKey(OUT_PATH)){
 
-            this.serverAddress = properties.getProperty(OUT_PATH);
+            this.outPath = properties.getProperty(OUT_PATH);
         }
 //        else{
 //            throw new IllegalArgumentException("Invalid argument for output path");
@@ -89,7 +89,7 @@ public class ArgumentsSeatMap {
 
         if(properties.containsKey(CATEGORY)){
 
-            this.serverAddress = properties.getProperty(CATEGORY);
+            this.category = properties.getProperty(CATEGORY);
         }
 //        else{
 //            throw new IllegalArgumentException("Invalid argument for category");
