@@ -97,7 +97,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
                             getAlternatives(ticket, oldFlight.getDestiny(), oldFlight.getFlightCode()).stream()
                                     .filter(flight -> flight.getAvailableSeats() > 0)
                                     .max(Comparator.comparing(
-                                            (Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
+                                            (Flight f) -> f.getFreeFromCategory(f.getBestAvailableCategory(ticket.getCategory())))
                                     .thenComparingInt(Flight::getAvailableSeats).reversed()
                                     .thenComparing(Flight::getFlightCode))
                                     .ifPresent( alternative -> {
