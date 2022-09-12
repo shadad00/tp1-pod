@@ -1,6 +1,7 @@
 package flightService.server;
 
 import ar.edu.itba.models.*;
+import ar.edu.itba.models.utils.AlternativeFlight;
 import ar.edu.itba.remoteInterfaces.Notifier;
 import servant.FlightNotificationImpl;
 
@@ -75,13 +76,14 @@ public class FlightCentral implements FlightMonitor{
     }
 
 
-    public List<Flight> getAlternativeFlights(SeatCategory category, String destiny){
+    public List<Flight> getAlternativeFlights(SeatCategory category, String destiny, String selfFlightCode){
         synchronized (flights) {
             return flights.values().stream()
                     .filter(
-                            flight -> flight.getStatus().equals(FlightStatus.PENDING)
+                            flight -> !flight.getFlightCode().equals(selfFlightCode)
+                                    && flight.getStatus().equals(FlightStatus.PENDING)
                                     && flight.getDestiny().equals(destiny)
-                                    && flight.hasAvailableSeatsForCategoryOrLower(category)).collect(Collectors.toList());
+                                    ).collect(Collectors.toList());
         }
     }
 

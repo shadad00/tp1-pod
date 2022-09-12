@@ -1,5 +1,6 @@
 package flightService.client;
 
+import ar.edu.itba.models.Flight;
 import ar.edu.itba.remoteInterfaces.FlightAdministration;
 import ar.edu.itba.remoteInterfaces.SeatAssignation;
 import flightService.client.arguments.ArgumentsSeatAssignation;
@@ -47,7 +48,7 @@ public class ClientSeatAssignation {
                     service.movePassenger(clientArguments.getFlightCode(), clientArguments.getPassenger(), clientArguments.getRow(), clientArguments.getCol());
                     break;
                 case "alternatives":
-                    service.checkAlternativeFlights(clientArguments.getFlightCode(), clientArguments.getPassenger());
+                    System.out.println(service.checkAlternativeFlights(clientArguments.getFlightCode(), clientArguments.getPassenger()));
                     break;
                 case "changeTicket":
                     service.changeTicket(clientArguments.getPassenger(), clientArguments.getFlightCode(), clientArguments.getOriginalFlight());

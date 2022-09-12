@@ -44,7 +44,18 @@ public class CategorySeats implements Serializable {
     }
 
     public Integer getAvailableSeats(){
-        return Arrays.stream(ticketSeats).mapToInt(row -> Arrays.stream(row).mapToInt(seat -> seat == null? 0 : 1).reduce(0, Integer::sum)).reduce(0, Integer::sum);
+//        int result = 0;
+//        for (Ticket[] row: ticketSeats
+//             ) {
+//            for (Ticket ticket : row
+//                 ) {
+//                result += ticket==null? 1 : 0;
+//            }
+//        }
+//        return result;
+        return Arrays.stream(ticketSeats).mapToInt(row -> Arrays.stream(row).
+                mapToInt(seat -> seat == null? 1 : 0).reduce(0, Integer::sum)).
+                reduce(0, Integer::sum);
     }
 
     public boolean isSeatAvailable(Integer row, Integer col){

@@ -93,7 +93,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
                         .forEach(
                         ticket -> {
 
-                            List<Flight> alternatives = getAlternatives(ticket, oldFlight.getDestiny());
+                            List<Flight> alternatives = getAlternatives(ticket, oldFlight.getDestiny(),oldFlight.getFlightCode());
 
                             if(!alternatives.isEmpty()){
                                 Optional<Flight> maybeNewFlight = alternatives.stream()
@@ -114,7 +114,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
     }
 
-    private List<Flight> getAlternatives(Ticket ticket, String destiny) {
-        return flightCentral.getAlternativeFlights(ticket.getCategory(),destiny);
+    private List<Flight> getAlternatives(Ticket ticket, String destiny,String selfFlightCode) {
+        return flightCentral.getAlternativeFlights(ticket.getCategory(),destiny,selfFlightCode);
     }
 }

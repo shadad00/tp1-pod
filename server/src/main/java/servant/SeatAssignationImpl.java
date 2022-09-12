@@ -1,14 +1,14 @@
 package servant;
 
 import ar.edu.itba.models.*;
+import ar.edu.itba.models.utils.AlternativeFlight;
 import ar.edu.itba.remoteInterfaces.SeatAssignation;
 import flightService.server.FlightCentral;
 
 import java.rmi.RemoteException;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class SeatAssignationImpl implements SeatAssignation {
 
@@ -53,14 +53,14 @@ public class SeatAssignationImpl implements SeatAssignation {
 
         if(flight.isSeatAvailable(row, fromColumnCharacter(col)) != null)
             throw new IllegalArgumentException("New seat is already taken.");
-        
+
         flight.freePassengerSeat(passenger);
         assignSeatPrivate(flightCode, passenger, row, fromColumnCharacter(col) );
         flightCentral.notifySeatChange(passenger,oldSeat,flight);
     }
 
     @Override
-    public List<Flight> checkAlternativeFlights(String flightCode, String passenger) throws RemoteException {
+    public String checkAlternativeFlights(String flightCode, String passenger) throws RemoteException {
         Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode))
                 .orElseThrow(IllegalArgumentException::new);
 
@@ -70,11 +70,24 @@ public class SeatAssignationImpl implements SeatAssignation {
         Ticket ticket = Optional.ofNullable(flight.getTicket(passenger))
                 .orElseThrow(IllegalArgumentException::new);
 
-        return flightCentral.getAlternativeFlights( ticket.getCategory(), flight.getDestiny()).stream().sorted(
-                Comparator.comparing((Flight f) -> f.getBestAvailableCategory(ticket.getCategory()))
-                        .thenComparingInt(Flight::getAvailableSeats).reversed()
-                        .thenComparing(Flight::getFlightCode)
-        ).collect(Collectors.toList());
+        List<Flight> flights =  flightCentral.getAlternativeFlights( ticket.getCategory(), flight.getDestiny(),flightCode);
+
+        List<AlternativeFlight> alternativeFlights = new ArrayList<>();
+
+        System.out.println(flights.get(0).getFlightCode());
+        for (Flight f : flights) {
+            int cant;
+            for (SeatCategory category : SeatCategory.values()) {
+                if( (cant=f.getFreeFromCategory(category) ) >0) {
+                    alternativeFlights.add(new AlternativeFlight(cant, category, f.getFlightCode(), f.getDestiny()));
+                }
+            }
+        }
+
+        System.out.println(alternativeFlights);
+        StringBuilder stringBuilder = new StringBuilder();
+        alternativeFlights.stream().sorted().forEach(stringBuilder::append);
+        return stringBuilder.toString();
 
     }
 
@@ -89,7 +102,7 @@ public class SeatAssignationImpl implements SeatAssignation {
                 .orElseThrow(RemoteException::new);
         Ticket oldTicket = oldFlight.getTicket(passenger);
         List<Flight> alternativeFlights = flightCentral
-                .getAlternativeFlights( oldTicket.getCategory(), oldFlight.getDestiny());
+                .getAlternativeFlights( oldTicket.getCategory(), oldFlight.getDestiny(),oldFlightCode);
         if(!alternativeFlights.contains(newFlight))
             throw new IllegalArgumentException();
         oldFlight.deletePassenger(passenger);

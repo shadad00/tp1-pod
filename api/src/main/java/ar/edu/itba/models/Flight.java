@@ -40,6 +40,14 @@ public class Flight implements Serializable {
     }
 
 
+    public int getFreeFromCategory(SeatCategory category){
+        if (this.categorySeats.get(category) != null) {
+            return this.categorySeats.get(category).getAvailableSeats();
+        }
+        return 0;
+    }
+
+
     public FlightStatus getStatus() {
         return status;
     }
@@ -61,7 +69,7 @@ public class Flight implements Serializable {
 
     public boolean hasAvailableSeatsForCategoryOrLower(SeatCategory category){
         for (int i = category.ordinal(); i < SeatCategory.values().length; i++) {
-            if(categorySeats.get(SeatCategory.values()[i]).getAvailableSeats() > 0 )
+            if(categorySeats.get(SeatCategory.values()[i]) != null && categorySeats.get(SeatCategory.values()[i]).getAvailableSeats() > 0 )
                 return true;
         }
         return false;
