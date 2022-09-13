@@ -48,7 +48,7 @@ public interface FlightAdministration extends Remote {
      * Forzar el cambio de tickets de vuelos cancelados por tickets de vuelos alternativos.
      * Se considera vuelo alternativo a un vuelo pendiente que tenga el mismo aeropuerto destino que el del vuelo original
      */
-    void forceTicketChangeForCancelledFlights() throws RemoteException;
+    String forceTicketChangeForCancelledFlights() throws RemoteException;
 
 
 }

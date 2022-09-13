@@ -8,6 +8,7 @@ import flightService.server.FlightCentral;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class FlightAdministrationImpl implements FlightAdministration {
@@ -26,14 +27,14 @@ public class FlightAdministrationImpl implements FlightAdministration {
             throw new IllegalArgumentException();
         }
 
-        EnumMap<SeatCategory, CategoryDescription> categoryDescriptors = new EnumMap<>(SeatCategory.class);
+        EnumMap<SeatCategory, PlaneCategoryInformation> categoryDescriptors = new EnumMap<>(SeatCategory.class);
 
         int totalRows = 0;
         for (SeatCategory category : SeatCategory.values()
              ) {
             RowColumnPair pair = categories.get(category);
             if(pair != null && pair.getRow() > 0 && pair.getColumn() > 0) {
-                categoryDescriptors.put(category, new CategoryDescription(category, totalRows+1, totalRows + pair.getRow(), pair.getColumn()));
+                categoryDescriptors.put(category, new PlaneCategoryInformation(category, totalRows+1, totalRows + pair.getRow(), pair.getColumn()));
                 totalRows += pair.getRow();
             }
         }
@@ -62,7 +63,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
     @Override
     public FlightStatus getFlightStatus(String flightCode) throws RemoteException {
         return Optional.ofNullable(flightCentral.getFlight(flightCode))
-                .orElseThrow(IllegalArgumentException::new).getFlightStatus();
+                .orElseThrow(IllegalArgumentException::new).getStatus();
     }
 
     @Override
@@ -84,7 +85,9 @@ public class FlightAdministrationImpl implements FlightAdministration {
     }
 
     @Override
-    public void forceTicketChangeForCancelledFlights() {
+    public String forceTicketChangeForCancelledFlights() {
+        AtomicInteger cantMoved = new AtomicInteger();
+        StringBuilder sb = new StringBuilder();
         flightCentral.getFlights().values().stream().filter(flight -> flight.getStatus().equals(FlightStatus.CANCELLED))
                 .sorted(Comparator.comparing(Flight::getFlightCode))
                 //for each cancelled flight ordered by flightCode.
@@ -94,17 +97,35 @@ public class FlightAdministrationImpl implements FlightAdministration {
                         .forEach(
                         ticket -> {
 
-                            getAlternatives(ticket, oldFlight.getDestiny(), oldFlight.getFlightCode()).stream()
-                                    .filter(flight -> flight.getAvailableSeats() > 0)
-                                    .max(Comparator.comparing(
-                                            (Flight f) -> f.getFreeFromCategory(f.getBestAvailableCategory(ticket.getCategory())))
-                                    .thenComparingInt(Flight::getAvailableSeats).reversed()
-                                    .thenComparing(Flight::getFlightCode))
-                                    .ifPresent( alternative -> {
-                                        ticket.clearSeat();
-                                        alternative.addTicket(ticket);
-                                        System.out.println("Moving" + ticket.getPassenger()+" to "+alternative.getFlightCode());
-                                    });
+                            List<AlternativeFlight> alternatives = flightCentral.getAlternatives(oldFlight.getFlightCode(), ticket.getPassenger());
+
+                            if(alternatives.isEmpty()) {
+                                System.out.println("No alternatives for " + ticket.getPassenger() + " to " + oldFlight.getDestiny());
+                                sb.append("Cannot find alternative flight for").append(ticket.getPassenger()).append(" to ").append(oldFlight.getDestiny()).append("\n");
+//                                throw new IllegalArgumentException();
+                            }else {
+                                cantMoved.getAndIncrement();
+                                Flight alternative = flightCentral.getFlight(alternatives.stream().sorted().collect(Collectors.toList()).get(0).getFlightCode());
+
+                                alternative.addTicket(ticket);
+                                oldFlight.deletePassengerTicket(ticket.getPassenger());
+                                System.out.println("Moving" + ticket.getPassenger() + " to " + alternative.getFlightCode());
+                            }
+
+
+
+
+//                            getAlternatives(ticket, oldFlight.getDestiny(), oldFlight.getFlightCode()).stream()
+//                                    .filter(flight -> flight.getAvailableSeats() > 0)
+//                                    .max(Comparator.comparing(
+//                                            (Flight f) -> f.getFreeFromCategory(f.getBestAvailableCategory(ticket.getCategory())))
+//                                    .thenComparingInt(Flight::getAvailableSeats).reversed()
+//                                    .thenComparing(Flight::getFlightCode))
+//                                    .ifPresent( alternative -> {
+//                                        ticket.clearSeat();
+//                                        alternative.addTicket(ticket);
+//                                        System.out.println("Moving" + ticket.getPassenger()+" to "+alternative.getFlightCode());
+//                                    });
 
 
 //                                Optional<Flight> maybeNewFlight = alternatives.stream()
@@ -121,6 +142,10 @@ public class FlightAdministrationImpl implements FlightAdministration {
                         }
                 )
         );
+
+        StringBuilder out = new StringBuilder(cantMoved + "tickets where changed.\n").append(sb);
+
+        return out.toString();
 
     }
 

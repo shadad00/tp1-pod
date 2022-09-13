@@ -2,8 +2,6 @@ package flightService.server;
 
 import ar.edu.itba.models.*;
 import ar.edu.itba.models.utils.AlternativeFlight;
-import ar.edu.itba.remoteInterfaces.Notifier;
-import servant.FlightNotificationImpl;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -108,7 +106,7 @@ public class FlightCentral implements FlightMonitor{
         Flight flight = Optional.ofNullable(getFlight(flightCode))
                 .orElseThrow(IllegalArgumentException::new);
 
-        if(flight.getFlightStatus().equals(FlightStatus.CONFIRMED))
+        if(flight.getStatus().equals(FlightStatus.CONFIRMED))
             throw new IllegalArgumentException();
 
         Ticket ticket = Optional.ofNullable(flight.getTicket(passenger))
@@ -121,7 +119,7 @@ public class FlightCentral implements FlightMonitor{
         for (Flight f : flights) {
             int cant;
             for (SeatCategory category : SeatCategory.values()) {
-                if( (cant=f.getFreeFromCategory(category) ) >0) {
+                if(ticket.getCategory().compareTo(category) <= 0  && (cant=f.getAvailableSeatsByCategory(category) ) >0) {
                     alternativeFlights.add(new AlternativeFlight(cant, category, f.getFlightCode(), f.getDestiny()));
                 }
             }

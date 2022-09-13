@@ -2,25 +2,25 @@ package ar.edu.itba.models;
 
 import java.io.Serializable;
 
-public class CategoryDescription implements Serializable {
-    private final Integer fromRow;
-    private final Integer toRow;
+public class PlaneCategoryInformation implements Serializable {
+    private final Integer initialRow;
+    private final Integer finalRow;
     private final Integer columnsNumber;
     private final SeatCategory category;
 
-    public CategoryDescription(SeatCategory category, Integer fromRow, Integer toRow, Integer columnsNumber) {
+    public PlaneCategoryInformation(SeatCategory category, Integer fromRow, Integer toRow, Integer columnsNumber) {
         this.category = category;
-        this.fromRow = fromRow;
-        this.toRow = toRow;
+        this.initialRow = fromRow;
+        this.finalRow = toRow;
         this.columnsNumber = columnsNumber;
     }
 
-    public int getFromRow() {
-        return fromRow;
+    public int getInitialRow() {
+        return initialRow;
     }
 
-    public int getToRow() {
-        return toRow;
+    public int getFinalRow() {
+        return finalRow;
     }
 
     public int getColumnsNumber(){
@@ -32,16 +32,13 @@ public class CategoryDescription implements Serializable {
     }
 
     public boolean contains(Integer row, Integer column){
-        if(row==null || column == null)
-            throw new IllegalArgumentException();
-
-        return row >= fromRow && row <= toRow && column >= 0 && column < columnsNumber;
+        return containsRow(row) && containsColumn(column);
     }
 
     public boolean containsRow(Integer row){
         if(row == null)
             throw new IllegalArgumentException();
-        return row >= fromRow && row <= toRow;
+        return row >= initialRow && row <= finalRow;
     }
 
     public boolean containsColumn(Integer column){
@@ -51,7 +48,7 @@ public class CategoryDescription implements Serializable {
     }
 
     public int getTotalSeats(){
-        return (toRow - fromRow + 1) * columnsNumber;
+        return (finalRow - initialRow + 1) * columnsNumber;
     }
 
 }

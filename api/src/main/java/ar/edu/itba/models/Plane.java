@@ -1,26 +1,24 @@
 package ar.edu.itba.models;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Objects;
 
 public class Plane implements Serializable {
 
     private final String modelName;
-    private final EnumMap<SeatCategory, CategoryDescription> categoryRows;
+    private final EnumMap<SeatCategory, PlaneCategoryInformation> categoryRows;
     private final Integer seats;
 
 
 
-    public Plane(String modelName, EnumMap<SeatCategory, CategoryDescription> categoryRows) {
+    public Plane(String modelName, EnumMap<SeatCategory, PlaneCategoryInformation> categoryRows) {
         this.modelName = modelName;
         this.categoryRows = categoryRows;
-        this.seats = categoryRows.values().stream().mapToInt(CategoryDescription::getTotalSeats).reduce(0, Integer::sum);
+        this.seats = categoryRows.values().stream().mapToInt(PlaneCategoryInformation::getTotalSeats).reduce(0, Integer::sum);
     }
 
-    public CategoryDescription getCategoryDescription(SeatCategory category){
+    public PlaneCategoryInformation getCategoryDescription(SeatCategory category){
         return this.categoryRows.get(category);
     }
 

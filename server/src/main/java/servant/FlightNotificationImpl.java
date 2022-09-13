@@ -35,7 +35,7 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
     public void registerUser(String flightCode, String passenger, Notifier notifier) throws IllegalUserRegistration, RemoteException {
         Flight flight = flightCentral.getFlight(flightCode);
         if(flight == null || notifier == null
-                || passenger==null || flight.getFlightStatus() == FlightStatus.CONFIRMED
+                || passenger==null || flight.getStatus() == FlightStatus.CONFIRMED
                         || !flight.passengerExists(passenger)){
             throw new IllegalUserRegistration("Flight not available for subscription for this user");
         }

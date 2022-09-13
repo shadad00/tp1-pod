@@ -16,6 +16,8 @@ public class AlternativeFlight implements Comparable<AlternativeFlight> {
     }
 
 
+
+
     @Override
     public int compareTo(AlternativeFlight o) {
         if (o == null) {
@@ -32,5 +34,21 @@ public class AlternativeFlight implements Comparable<AlternativeFlight> {
     @Override
     public String toString() {
         return String.format("%s | %s | %d %s\n", destiny, flightCode, seats, category);
+    }
+
+    public Integer getSeats() {
+        return seats;
+    }
+
+    public SeatCategory getCategory() {
+        return category;
+    }
+
+    public String getFlightCode() {
+        return flightCode;
+    }
+
+    public String getDestiny() {
+        return destiny;
     }
 }

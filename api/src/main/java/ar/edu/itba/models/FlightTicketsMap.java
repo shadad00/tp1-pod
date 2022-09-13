@@ -3,26 +3,26 @@ package ar.edu.itba.models;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class CategorySeats implements Serializable {
+public class FlightTicketsMap implements Serializable {
 
-    private final CategoryDescription description;
+    private final PlaneCategoryInformation categoryInformation;
     private final Ticket[][] ticketSeats;
 
-    public CategorySeats(CategoryDescription description) {
-        this.description = description;
-        this.ticketSeats = new Ticket[description.getToRow() - description.getFromRow() + 1][description.getColumnsNumber()];
+    public FlightTicketsMap(PlaneCategoryInformation description) {
+        this.categoryInformation = description;
+        this.ticketSeats = new Ticket[description.getFinalRow() - description.getInitialRow() + 1][description.getColumnsNumber()];
     }
 
-    public Integer getFromRow(){
-        return description.getFromRow();
+    public Integer getInitialRow(){
+        return categoryInformation.getInitialRow();
     }
 
-    public Integer getNrows() {
-        return description.getToRow() - description.getFromRow() + 1;
+    public Integer getRowsNumber() {
+        return categoryInformation.getFinalRow() - categoryInformation.getInitialRow() + 1;
     }
 
-    public Integer getNcols() {
-        return description.getColumnsNumber();
+    public Integer getColumnsNumber() {
+        return categoryInformation.getColumnsNumber();
     }
 
     public Ticket[][] getTicketSeats() {
@@ -30,29 +30,20 @@ public class CategorySeats implements Serializable {
     }
 
     public Ticket[] getRow(Integer row){
-        if(!description.containsRow(row))
+        if(!categoryInformation.containsRow(row))
             throw new IllegalArgumentException("Row does not exists");
         return ticketSeats[getRealRowIndex(row)];
     }
 
     public boolean contains(Integer row, Integer col){
-        return description.contains(row, col);
+        return categoryInformation.contains(row, col);
     }
 
     public boolean containsRow(Integer row){
-        return description.containsRow(row);
+        return categoryInformation.containsRow(row);
     }
 
     public Integer getAvailableSeats(){
-//        int result = 0;
-//        for (Ticket[] row: ticketSeats
-//             ) {
-//            for (Ticket ticket : row
-//                 ) {
-//                result += ticket==null? 1 : 0;
-//            }
-//        }
-//        return result;
         return Arrays.stream(ticketSeats).mapToInt(row -> Arrays.stream(row).
                 mapToInt(seat -> seat == null? 1 : 0).reduce(0, Integer::sum)).
                 reduce(0, Integer::sum);
@@ -65,7 +56,7 @@ public class CategorySeats implements Serializable {
     }
 
     public String getPassengerFromSeat(Integer row, Integer col){
-        if(!contains(row, col))
+        if( !contains(row, col) )
             throw new IllegalArgumentException();
         return ticketSeats[getRealRowIndex(row)][col]==null ?
                 null : ticketSeats[getRealRowIndex(row)][col].getPassenger();
@@ -79,7 +70,7 @@ public class CategorySeats implements Serializable {
         // trato de asignarle el asiento pedido
         if (isSeatAvailable(row, col)) {
             int newRow = getRealRowIndex(row);
-            ticket.assignSeat(new Seat(row,col,description.getCategory()));
+            ticket.assignSeat(new Seat(row,col, categoryInformation.getCategory()));
             ticketSeats[newRow][col] = ticket;
             return ticketSeats[newRow][col];
         }
@@ -107,11 +98,10 @@ public class CategorySeats implements Serializable {
     }
 
     private int getRealRowIndex(Integer row){
-        return row - description.getFromRow();
+        return row - categoryInformation.getInitialRow();
     }
-
     private int getRealRow(Integer row){
-        return row + description.getFromRow();
+        return row + categoryInformation.getInitialRow();
     }
 
 }

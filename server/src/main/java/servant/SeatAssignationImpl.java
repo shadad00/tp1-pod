@@ -6,7 +6,6 @@ import ar.edu.itba.remoteInterfaces.SeatAssignation;
 import flightService.server.FlightCentral;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +33,7 @@ public class SeatAssignationImpl implements SeatAssignation {
     private boolean assignSeatPrivate(String flightCode, String passenger, Integer row, Integer col){
         Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode))
                 .orElseThrow(IllegalArgumentException::new);
-        if(!flight.getFlightStatus().equals(FlightStatus.PENDING))
+        if(!flight.getStatus().equals(FlightStatus.PENDING))
             throw new IllegalArgumentException();
         Ticket passengerTicket = Optional.ofNullable(flight.getTicket(passenger))
                 .orElseThrow(IllegalArgumentException::new);
@@ -54,7 +53,7 @@ public class SeatAssignationImpl implements SeatAssignation {
         if(flight.isSeatAvailable(row, fromColumnCharacter(col)) != null)
             throw new IllegalArgumentException("New seat is already taken.");
 
-        flight.freePassengerSeat(passenger);
+        flight.freeSeatByPassenger(passenger);
         assignSeatPrivate(flightCode, passenger, row, fromColumnCharacter(col) );
         flightCentral.notifySeatChange(passenger,oldSeat,flight);
     }
@@ -80,7 +79,7 @@ public class SeatAssignationImpl implements SeatAssignation {
         System.out.println("passenger " + passenger);
         Flight oldFlight = Optional.ofNullable(flightCentral.getFlight(oldFlightCode))
                 .orElseThrow(IllegalArgumentException::new);
-        if(oldFlight.getFlightStatus().equals(FlightStatus.CONFIRMED)
+        if(oldFlight.getStatus().equals(FlightStatus.CONFIRMED)
                 || !oldFlight.passengerExists(passenger))
             throw new IllegalArgumentException();
         Flight newFlight = Optional.ofNullable(flightCentral.getFlight(newFlightCode))
@@ -90,7 +89,7 @@ public class SeatAssignationImpl implements SeatAssignation {
                 .getAlternativeFlights( oldTicket.getCategory(), oldFlight.getDestiny(),oldFlightCode);
         if(!alternativeFlights.contains(newFlight))
             throw new IllegalArgumentException();
-        oldFlight.deletePassenger(passenger);
+        oldFlight.deletePassengerTicket(passenger);
         newFlight.addTicket(oldTicket);
         flightCentral.notifyFlightChange(passenger,oldFlight,newFlight);
     }

@@ -38,10 +38,10 @@ public class SeatMapImpl implements SeatMap {
     public String getSeatMapByCategory(String flightCode, SeatCategory category) throws RemoteException {
         Flight flight = Optional.ofNullable(this.flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
         StringBuilder answer = new StringBuilder();
-        CategorySeats categorySeats = flight.getCategorySeats(category);
+        FlightTicketsMap categorySeats = flight.getFlightTicketsMapByCategory(category);
         if (categorySeats != null) {
-            for(int i = 0 ; i < categorySeats.getNrows(); i++){
-                answer.append(getSeatMapByRowWithCategory(flight,categorySeats.getFromRow()+i,category));
+            for(int i = 0; i < categorySeats.getRowsNumber(); i++){
+                answer.append(getSeatMapByRowWithCategory(flight,categorySeats.getInitialRow()+i,category));
             }
         }
 
@@ -75,7 +75,7 @@ public class SeatMapImpl implements SeatMap {
 
 
     private String getSeatMapByRowWithCategory(Flight flight , int row , SeatCategory category){
-        Ticket[] ticketRow = flight.getCategorySeats(category).getRow(row);
+        Ticket[] ticketRow = flight.getFlightTicketsMapByCategory(category).getRow(row);
         return rowToString(category,ticketRow,row);
     }
 

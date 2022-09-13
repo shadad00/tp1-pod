@@ -56,14 +56,14 @@ public class ClientFlightAdministration {
                     break;
                 case "confirm":
                     service.confirmFlight(clientArguments.getFlightCode());
-                    System.out.println("Flight" + clientArguments.getFlightCode()  + "is confirmed");
+                    System.out.println("Flight " + clientArguments.getFlightCode()  + " is confirmed");
                     break;
                 case "cancel":
                     service.cancelFlight(clientArguments.getFlightCode());
-                    System.out.println("Flight" + clientArguments.getFlightCode()  + "is cancelled");
+                    System.out.println("Flight " + clientArguments.getFlightCode()  + " is cancelled");
                     break;
                 case "retticketing":
-                    service.forceTicketChangeForCancelledFlights();
+                    System.out.println(service.forceTicketChangeForCancelledFlights());
                     break;
             }
 
