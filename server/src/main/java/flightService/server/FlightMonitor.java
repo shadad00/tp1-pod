@@ -1,7 +1,6 @@
 package flightService.server;
 
 import ar.edu.itba.models.Flight;
-import ar.edu.itba.models.Passenger;
 import ar.edu.itba.models.Seat;
 
 import java.rmi.RemoteException;

@@ -2,6 +2,7 @@ package ar.edu.itba.models;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Flight implements Serializable {
 
@@ -9,9 +10,12 @@ public class Flight implements Serializable {
     private final String destiny;
     private FlightStatus status;
     private final EnumMap<SeatCategory, FlightTicketsMap> flightSeatsMap;
-    private final Map<String, Ticket> tickets;
+    private final ConcurrentHashMap<String, Ticket> tickets;
 
-    public Flight(String flightCode, String destiny, Plane plane, Map<String, Ticket> tickets) {
+    private final String mutex_status = "Status";
+
+
+    public Flight(String flightCode, String destiny, Plane plane, ConcurrentHashMap<String, Ticket> tickets) {
         this.flightCode = flightCode;
         this.destiny = destiny;
         this.status = FlightStatus.PENDING;
@@ -27,57 +31,52 @@ public class Flight implements Serializable {
         this.tickets = tickets;
     }
 
+    public String getFlightCode() {
+        return flightCode;
+    }
+
+
+    public String getDestiny() {
+        return destiny;
+    }
+
+
+
+    //Seat_map does not change and FlightTicketsMap is synchronized.
     public FlightTicketsMap getFlightTicketsMapByCategory(SeatCategory category){
-        return this.flightSeatsMap.get(category);
+            return this.flightSeatsMap.get(category);
     }
 
     public SeatCategory getCategoryFromRow(int row){
         for (SeatCategory category : SeatCategory.values()) {
-            if(flightSeatsMap.get(category) != null && flightSeatsMap.get(category).containsRow(row))
-                return category;
+                if(flightSeatsMap.containsKey(category) && flightSeatsMap.get(category).containsRow(row))
+                    return category;
         }
         return null;
     }
 
 
     public int getAvailableSeatsByCategory(SeatCategory category){
-        if (this.flightSeatsMap.get(category) != null) {
-            return this.flightSeatsMap.get(category).getAvailableSeats();
-        }
+            if (this.flightSeatsMap.containsKey(category)) {
+                return this.flightSeatsMap.get(category).getAvailableSeats();
+            }
         return 0;
     }
 
 
     public FlightStatus getStatus() {
-        return status;
+        synchronized (mutex_status) {
+            return status;
+        }
     }
 
     public void setStatus(FlightStatus status) {
-        this.status = status;
-    }
-
-    public Collection<Ticket> getTickets() {
-        return tickets.values();
-    }
-
-    public String getDestiny() {
-        return destiny;
-    }
-
-    public boolean hasAvailableSeatsForCategoryOrLower(SeatCategory category){
-        for (int i = category.ordinal(); i < SeatCategory.values().length; i++) {
-            if(flightSeatsMap.get(SeatCategory.values()[i]) != null && flightSeatsMap.get(SeatCategory.values()[i]).getAvailableSeats() > 0 )
-                return true;
+        synchronized (mutex_status) {
+            this.status = status;
         }
-        return false;
     }
 
-    public SeatCategory getBestAvailableCategory(SeatCategory category){
-        for(SeatCategory categories : SeatCategory.values())
-            if(categories.compareTo(category) <= 0 && flightSeatsMap.get(categories).getAvailableSeats() > 0)
-                return categories;
-        return SeatCategory.ECONOMY;
-    }
+
 
     public String isSeatAvailable(Integer row, Integer col){
         for(FlightTicketsMap seats: flightSeatsMap.values()){
@@ -88,28 +87,17 @@ public class Flight implements Serializable {
         throw new IllegalArgumentException("Seat does not exist");
     }
 
-    public int getAvailableSeats(){
-        return flightSeatsMap.values().stream().mapToInt(FlightTicketsMap::getAvailableSeats).reduce(0, Integer::sum);
-    }
 
-    public String getFlightCode() {
-        return flightCode;
-    }
 
-    public void addTicket(Ticket ticket){
-        if(tickets.containsKey(ticket.getPassenger()))
-            throw new IllegalArgumentException();
-        tickets.put(ticket.getPassenger(), ticket);
-    }
+
 
     public boolean assignSeat(String passenger, Integer row, Integer col){
         Ticket ticket;
         if(status != FlightStatus.PENDING
             || (ticket=Optional.ofNullable(tickets.get(passenger))
                 .orElseThrow(IllegalArgumentException::new))
-                .getSeat() != null
-        )
-            return false; //para asignar un asiento solo debe estar pendiente el vuelo
+                .hasSeat())
+            throw new IllegalArgumentException(); //para asignar un asiento solo debe estar pendiente el vuelo
 
 
         for(Map.Entry<SeatCategory, FlightTicketsMap> entry: flightSeatsMap.entrySet()) {
@@ -144,17 +132,19 @@ public class Flight implements Serializable {
         return ticket;
     }
 
-    public boolean seatExists(Integer row, Integer column){
-        for(FlightTicketsMap seats: flightSeatsMap.values()){
-            if(seats.contains(row, column))
-                return true;
-        }
-        return false;
+    public Collection<Ticket> getTickets() {
+        return Collections.unmodifiableCollection(tickets.values());
     }
+
 
     public Ticket getTicket(String passenger){
         return this.tickets.get(passenger);
     }
 
+    public void addTicket(Ticket ticket){
+        if(tickets.containsKey(ticket.getPassenger()))
+            throw new IllegalArgumentException();
+        tickets.put(ticket.getPassenger(), ticket);
+    }
 
 }

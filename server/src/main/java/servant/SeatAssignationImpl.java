@@ -4,20 +4,23 @@ import ar.edu.itba.models.*;
 import ar.edu.itba.models.utils.AlternativeFlight;
 import ar.edu.itba.remoteInterfaces.SeatAssignation;
 import flightService.server.FlightCentral;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Optional;
 
+
 public class SeatAssignationImpl implements SeatAssignation {
 
     private final FlightCentral flightCentral;
+    private static final Logger LOG = LoggerFactory.getLogger(SeatAssignationImpl.class);
+
 
     public SeatAssignationImpl(FlightCentral flightCentral) {
         this.flightCentral = flightCentral;
     }
-
-
 
     @Override
     public String isSeatFree(String flightCode, Integer row, Character col) throws RemoteException {
@@ -26,8 +29,11 @@ public class SeatAssignationImpl implements SeatAssignation {
 
     @Override
     public void assignSeat(String flightCode, String passenger, Integer row, Character col) throws RemoteException {
-        if (!assignSeatPrivate(flightCode,passenger,row, fromColumnCharacter(col) )) {
-            System.out.println("Couldn't assign passenger" + passenger + " to seat " + row + col);
+
+        synchronized (flightCentral.getFlight(flightCode).getFlightCode()) {
+                if (!assignSeatPrivate(flightCode,passenger,row, fromColumnCharacter(col) )) {
+                    LOG.info("Couldn't assign passenger" + passenger + " to seat " + row + col);
+                }
         }
         flightCentral.notifyAssignation(passenger,flightCentral.getFlight(flightCode));
     }
@@ -48,6 +54,7 @@ public class SeatAssignationImpl implements SeatAssignation {
 
     @Override
     public void movePassenger(String flightCode, String passenger, Integer row, Character col) throws RemoteException {
+
         Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
         Ticket passengerTicket = Optional.ofNullable(flight.getTicket(passenger)).orElseThrow(IllegalArgumentException::new);
         Seat oldSeat = passengerTicket.getSeat();
@@ -55,8 +62,11 @@ public class SeatAssignationImpl implements SeatAssignation {
         if(flight.isSeatAvailable(row, fromColumnCharacter(col)) != null)
             throw new IllegalArgumentException("New seat is already taken.");
 
-        flight.freeSeatByPassenger(passenger);
-        assignSeatPrivate(flightCode, passenger, row, fromColumnCharacter(col) );
+        synchronized (flightCentral.getFlight(flightCode).getFlightCode()) {
+            flight.freeSeatByPassenger(passenger);
+            assignSeatPrivate(flightCode, passenger, row, fromColumnCharacter(col));
+        }
+
         flightCentral.notifySeatChange(passenger,oldSeat,flight);
     }
 
@@ -76,9 +86,16 @@ public class SeatAssignationImpl implements SeatAssignation {
 
     @Override
     public void changeTicket(String passenger, String oldFlightCode, String newFlightCode) throws RemoteException {
-        System.out.println("old " + oldFlightCode);
-        System.out.println("new:"  +newFlightCode);
-        System.out.println("passenger " + passenger);
+        LOG.info("old " + oldFlightCode);
+        LOG.info("new:"  +newFlightCode);
+        LOG.info("passenger " + passenger);
+
+        if (oldFlightCode.equals(newFlightCode)) {
+            throw new IllegalArgumentException("The flights are the same");
+        }
+        String min = oldFlightCode.compareTo(newFlightCode) < 0 ? oldFlightCode : newFlightCode;
+        String max = oldFlightCode.compareTo(newFlightCode) < 0 ? newFlightCode : oldFlightCode;
+
         Flight oldFlight = Optional.ofNullable(flightCentral.getFlight(oldFlightCode))
                 .orElseThrow(IllegalArgumentException::new);
         if(oldFlight.getStatus().equals(FlightStatus.CONFIRMED)
@@ -91,9 +108,16 @@ public class SeatAssignationImpl implements SeatAssignation {
                 .getAlternativeFlights( oldTicket.getCategory(), oldFlight.getDestiny(),oldFlightCode);
         if(!alternativeFlights.contains(newFlight))
             throw new IllegalArgumentException();
-        oldFlight.deletePassengerTicket(passenger);
-        newFlight.addTicket(oldTicket);
+
+        synchronized (flightCentral.getFlight(min).getFlightCode()){
+            synchronized (flightCentral.getFlight(max).getFlightCode()){
+                oldFlight.deletePassengerTicket(passenger);
+                newFlight.addTicket(oldTicket);
+            }
+        }
+
         flightCentral.notifyFlightChange(passenger,oldFlight,newFlight);
+
     }
 
     private int fromColumnCharacter(Character column){

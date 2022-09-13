@@ -2,90 +2,86 @@ package flightService.server;
 
 import ar.edu.itba.models.*;
 import ar.edu.itba.models.utils.AlternativeFlight;
+import ar.edu.itba.remoteInterfaces.FlightAdministration;
+import ar.edu.itba.remoteInterfaces.SeatAssignation;
+import ar.edu.itba.remoteInterfaces.SeatMap;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class FlightCentral implements FlightMonitor{
+public class FlightCentral implements FlightMonitor {
 
     // codigo de vuelo -> vuelos
-    private final Map<String, Flight> flights;
+    private final ConcurrentHashMap<String, Flight> flights;
 
     //modelos -> aviones
-    private final Map<String, Plane> models;
+    private final ConcurrentHashMap<String, Plane> models;
+    public static final String mutex_system = "mutex_cancellation";
 
-    private  FlightMonitor internalNotifier;
+    private FlightMonitor internalNotifier;
+//    private final  FlightAdministration internalAdmin;
+//    private final  SeatAssignation internalAssignation;
+//    private final  SeatMap internalSeatMap;
+
+    private final String mutex_notificator = "mutex_notificator";
+
+
 
     public FlightCentral() {
-        flights = new HashMap<>();
-        models = new HashMap<>();
+        flights = new ConcurrentHashMap<>();
+        models = new ConcurrentHashMap<>();
+
     }
 
     public void setNotificator(FlightMonitor monitor){
-        internalNotifier= monitor;
-    }
-
-
-    public FlightMonitor getFlightMonitor(){
-        return this.internalNotifier;
+        synchronized (mutex_notificator) {
+            if (internalNotifier == null) {
+                internalNotifier = monitor;
+            }
+        }
     }
 
     public Flight getFlight(String code){
-        synchronized (flights) {
-            return flights.get(code);
-        }
+        return flights.get(code);
     }
 
     public Map<String, Flight> getFlights() {
-        synchronized (flights) {
-            return flights;
-        }
+            return Collections.unmodifiableMap(flights);
     }
 
     public Plane getModels(String model) {
-        synchronized (models) {
-            return models.get(model);
-        }
+        return models.get(model);
     }
 
     public Flight addFlight(String flightCode, Flight newFlight){
-        synchronized (flights) {
-            return flights.putIfAbsent(flightCode, newFlight);
-        }
+        return flights.putIfAbsent(flightCode, newFlight);
     }
 
 
     public Plane addModel(String modelName, Plane plane){
-        synchronized (models) {
-            return models.putIfAbsent(modelName, plane);
-        }
+        return models.putIfAbsent(modelName, plane);
     }
 
     public boolean flightExists(String flightCode){
-        synchronized (flights) {
-            return flights.containsKey(flightCode);
-        }
+        return flights.containsKey(flightCode);
     }
 
     public boolean modelExists(String model){
-        synchronized (models) {
-            return models.containsKey(model);
-        }
+        return models.containsKey(model);
     }
 
 
     public List<Flight> getAlternativeFlights(SeatCategory category, String destiny, String selfFlightCode){
-        synchronized (flights) {
-            return flights.values().stream()
+        return flights.values().stream()
                     .filter(
                             flight -> !flight.getFlightCode().equals(selfFlightCode)
                                     && flight.getStatus().equals(FlightStatus.PENDING)
                                     && flight.getDestiny().equals(destiny)
                                     ).collect(Collectors.toList());
-        }
+
     }
 
-    //TODO: chequear si están bien sincronizadas las notifications
     public void notifyConfirmation(Flight flight){
         internalNotifier.notifyConfirmation(flight);
     }

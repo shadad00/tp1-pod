@@ -2,11 +2,13 @@ package ar.edu.itba.models;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class FlightTicketsMap implements Serializable {
 
     private final PlaneCategoryInformation categoryInformation;
     private final Ticket[][] ticketSeats;
+    private final String mutex = "Ticket_semaphore";
 
     public FlightTicketsMap(PlaneCategoryInformation description) {
         this.categoryInformation = description;
@@ -21,18 +23,13 @@ public class FlightTicketsMap implements Serializable {
         return categoryInformation.getFinalRow() - categoryInformation.getInitialRow() + 1;
     }
 
-    public Integer getColumnsNumber() {
-        return categoryInformation.getColumnsNumber();
-    }
-
-    public Ticket[][] getTicketSeats() {
-        return ticketSeats;
-    }
 
     public Ticket[] getRow(Integer row){
         if(!categoryInformation.containsRow(row))
             throw new IllegalArgumentException("Row does not exists");
-        return ticketSeats[getRealRowIndex(row)];
+        synchronized (mutex) {
+            return ticketSeats[getRealRowIndex(row)];
+        }
     }
 
     public boolean contains(Integer row, Integer col){
@@ -44,22 +41,30 @@ public class FlightTicketsMap implements Serializable {
     }
 
     public Integer getAvailableSeats(){
-        return Arrays.stream(ticketSeats).mapToInt(row -> Arrays.stream(row).
-                mapToInt(seat -> seat == null? 1 : 0).reduce(0, Integer::sum)).
+        Stream<Ticket[]> stream;
+        synchronized (mutex) {
+             stream = Arrays.stream(ticketSeats);
+        }
+        return stream.mapToInt(row -> Arrays.stream(row).
+                mapToInt(seat -> seat == null ? 1 : 0).reduce(0, Integer::sum)).
                 reduce(0, Integer::sum);
     }
 
     public boolean isSeatAvailable(Integer row, Integer col){
         if(!contains(row, col))
             throw new IllegalArgumentException();
-        return ticketSeats[getRealRowIndex(row)][col]==null;
+        synchronized (mutex){
+            return ticketSeats[getRealRowIndex(row)][col]==null;
+        }
     }
 
     public String getPassengerFromSeat(Integer row, Integer col){
         if( !contains(row, col) )
             throw new IllegalArgumentException();
-        return ticketSeats[getRealRowIndex(row)][col]==null ?
-                null : ticketSeats[getRealRowIndex(row)][col].getPassenger();
+       synchronized (mutex){
+           return ticketSeats[getRealRowIndex(row)][col]==null ?
+                   null : ticketSeats[getRealRowIndex(row)][col].getPassenger();
+       }
     }
 
 
@@ -71,8 +76,10 @@ public class FlightTicketsMap implements Serializable {
         if (isSeatAvailable(row, col)) {
             int newRow = getRealRowIndex(row);
             ticket.assignSeat(new Seat(row,col, categoryInformation.getCategory()));
-            ticketSeats[newRow][col] = ticket;
-            return ticketSeats[newRow][col];
+           synchronized (mutex){
+               ticketSeats[newRow][col] = ticket;
+               return ticketSeats[newRow][col];
+           }
         }
 
         // trato de asignarle un asiento libre de esta categoria
@@ -94,14 +101,13 @@ public class FlightTicketsMap implements Serializable {
         if(!contains(row, column))
             throw new IllegalArgumentException();
 
-        ticketSeats[getRealRowIndex(row)][column] = null;
+        synchronized (mutex){
+            ticketSeats[getRealRowIndex(row)][column] = null;
+        }
     }
 
     private int getRealRowIndex(Integer row){
         return row - categoryInformation.getInitialRow();
-    }
-    private int getRealRow(Integer row){
-        return row + categoryInformation.getInitialRow();
     }
 
 }

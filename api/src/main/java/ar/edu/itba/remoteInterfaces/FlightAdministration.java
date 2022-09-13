@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface FlightAdministration extends Remote {
 
@@ -23,7 +24,7 @@ public interface FlightAdministration extends Remote {
      * indicando para cada ticket el nombre del pasajero y la categoría del ticket
      * (categoría de asiento comprada).
      */
-    void addFlight(String modelName, String flightCode, String destinationAirportCode, Map<String, Ticket> tickets) throws RemoteException;
+    void addFlight(String modelName, String flightCode, String destinationAirportCode, ConcurrentHashMap<String, Ticket> tickets) throws RemoteException;
 
     /**
      * Consultar el estado de un vuelo a partir del código de vuelo, indicando si está pendiente,

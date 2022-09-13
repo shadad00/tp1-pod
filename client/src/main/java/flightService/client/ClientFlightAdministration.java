@@ -19,6 +19,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientFlightAdministration {
 
@@ -104,15 +105,15 @@ public class ClientFlightAdministration {
     private static void parseFlightsFile(List<String> file, FlightAdministration service) throws RemoteException {
         for(String line : file ) {
             String[] parse = line.split(";");
-            Map<String, Ticket> passengers = parseTickets(parse[3]);
+            ConcurrentHashMap<String, Ticket> passengers = parseTickets(parse[3]);
             service.addFlight(parse[0], parse[1], parse[2], passengers);
         }
 
         System.out.println(file.size() + " Flights created\n");
     }
 
-    private static Map<String, Ticket> parseTickets(String modelLines) {
-        Map<String, Ticket> tickets = new HashMap<>();
+    private static ConcurrentHashMap<String, Ticket> parseTickets(String modelLines) {
+        ConcurrentHashMap<String, Ticket> tickets = new ConcurrentHashMap<>();
         for (String s : modelLines.split(",")) {
             String[] categoryEntry = s.split("#");
             tickets.put(categoryEntry[1],

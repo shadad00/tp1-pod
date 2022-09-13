@@ -28,7 +28,6 @@ public class SeatMapImpl implements SeatMap {
     public String getSeatMap(String flightCode) throws RemoteException {
         StringBuilder answer = new StringBuilder();
         for(SeatCategory category : SeatCategory.values()){
-
             answer.append(getSeatMapByCategory(flightCode,category));
         }
         return answer.toString();
@@ -44,7 +43,6 @@ public class SeatMapImpl implements SeatMap {
                 answer.append(getSeatMapByRowWithCategory(flight,categorySeats.getInitialRow()+i,category));
             }
         }
-
         return answer.toString();
     }
 

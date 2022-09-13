@@ -5,7 +5,7 @@ import ar.edu.itba.models.utils.RowColumnPair;
 import java.io.Serializable;
 
 public class Ticket implements Serializable {
-    private String passenger;
+    private final String passenger;
     private SeatCategory category;
     private Seat seat;
 
@@ -14,32 +14,35 @@ public class Ticket implements Serializable {
         this.category = category;
     }
 
-    public SeatCategory getCategory() {
+    public synchronized SeatCategory getCategory() {
         return category;
     }
 
-    public void setCategory(SeatCategory category) {
+    public synchronized void setCategory(SeatCategory category) {
         this.category = category;
     }
 
-    public boolean hasSeat(){
-        return this.seat != null;
+    public synchronized boolean hasSeat(){
+            return this.seat != null;
+
     }
 
     public String getPassenger() {
         return passenger;
     }
 
-    public Seat getSeat() {
-        return seat;
+    public synchronized Seat getSeat() {
+            return seat;
+
     }
 
-    public void assignSeat(Seat seat){
-        this.seat = seat;
+    public synchronized void assignSeat(Seat seat){
+            this.seat =seat;
     }
+
 
     public void clearSeat(){
-        this.seat = null;
+        assignSeat(null);
     }
 
 
