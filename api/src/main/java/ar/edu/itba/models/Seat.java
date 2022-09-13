@@ -16,7 +16,11 @@ public class Seat implements Serializable {
         return row;
     }
 
-    public int getColumn() {
+    public Character getCharColumn() {
+        return (char)(column+'A');
+    }
+
+    public int getColumn(){
         return column;
     }
 

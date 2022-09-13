@@ -26,7 +26,9 @@ public class SeatAssignationImpl implements SeatAssignation {
 
     @Override
     public void assignSeat(String flightCode, String passenger, Integer row, Character col) throws RemoteException {
-        assignSeatPrivate(flightCode,passenger,row, fromColumnCharacter(col) );
+        if (!assignSeatPrivate(flightCode,passenger,row, fromColumnCharacter(col) )) {
+            System.out.println("Couldn't assign passenger" + passenger + " to seat " + row + col);
+        }
         flightCentral.notifyAssignation(passenger,flightCentral.getFlight(flightCode));
     }
 

@@ -103,16 +103,18 @@ public class Flight implements Serializable {
     }
 
     public boolean assignSeat(String passenger, Integer row, Integer col){
-        if(status != FlightStatus.PENDING)
-            return false; //para asignar un asiento solo debe estar pendiente el vuelo
         Ticket ticket;
+        if(status != FlightStatus.PENDING
+            || (ticket=Optional.ofNullable(tickets.get(passenger))
+                .orElseThrow(IllegalArgumentException::new))
+                .getSeat() != null
+        )
+            return false; //para asignar un asiento solo debe estar pendiente el vuelo
 
-        if((ticket=Optional.ofNullable(tickets.get(passenger)).orElseThrow(IllegalArgumentException::new)).getSeat() != null)
-            return false; //el pasajero ya tiene un asiento en el vuelo
 
         for(Map.Entry<SeatCategory, FlightTicketsMap> entry: flightSeatsMap.entrySet()) {
             // si el asiento es de menor o igual categoria que la del ticket comprado
-            if (entry.getKey().ordinal() >= ticket.getCategory().ordinal() && entry.getValue().contains(row, col)) {
+            if (/*entry.getKey().compareTo(ticket.getCategory())>=0*/ entry.getKey().ordinal() >= ticket.getCategory().ordinal() && entry.getValue().contains(row, col)) {
                 return entry.getValue().assignSeat(row, col, ticket) != null;
             }
         }

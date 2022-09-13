@@ -14,28 +14,37 @@ public class NotifierImpl implements Notifier {
 
     @Override
     public void notifyConfirmation(String flightCode, String destination, Seat currentSeat) throws RemoteException {
-        System.out.println("Your Flight "+ flightCode +"with destination " + destination +" was confirmed and your seat is " +
-                currentSeat.getCategory() + " " + currentSeat.getRow() + currentSeat.getColumn() + " .");
+       String output = "Your Flight "+ flightCode +" with destination " + destination +" was confirmed";
+       if(currentSeat!=null)
+           output+=" and your seat is " +
+        currentSeat.getCategory() + " " + currentSeat.getRow() + currentSeat.getCharColumn() + " .";
+        System.out.println( output);
     }
 
     @Override
     public void notifyCancellation(String flightCode, String destination, Seat currentSeat) throws RemoteException {
-        System.out.println("Your Flight "+
+        String output = "Your Flight "+
                 flightCode  +
-                "with destination " + destination +
-                " was confirmed and your seat is " +
-                currentSeat.getCategory() + " " +
-                currentSeat.getRow() +
-                currentSeat.getColumn() +
-                " .");
+                " with destination " + destination +
+                " was cancelled";
+        if(currentSeat != null){
+            output += " and your seat is " +
+                    currentSeat.getCategory() + " " +
+                    currentSeat.getRow() +
+                    currentSeat.getCharColumn() +
+                    " .";
+        }
+
+        System.out.println(output);
     }
 
     @Override
     public void notifyAssignation(String flightCode, String destination, Seat currentSeat) throws RemoteException {
-        System.out.println("Your seat is" +
+        System.out.println("seat " + currentSeat);
+        System.out.println("Your seat is " +
                 currentSeat.getCategory() + " " +
                 currentSeat.getRow() +
-                currentSeat.getColumn() + "for Flight " + flightCode +"with destination "+ destination );
+                currentSeat.getCharColumn() + " for Flight " + flightCode +" with destination "+ destination );
     }
 
     @Override
@@ -44,18 +53,19 @@ public class NotifierImpl implements Notifier {
         System.out.println("Your seat changed to " +
                 newSeat.getCategory() +
                 " " + newSeat.getRow() +
-                " " + newSeat.getColumn()
+                newSeat.getCharColumn()
                 + " from " +  originalSeat.getCategory() +
                 " " + originalSeat.getRow() +
-                " " + originalSeat.getColumn() + "for Flight" +
+                 originalSeat.getCharColumn() + " for Flight " +
                 flight.getFlightCode() + " with destination " +  flight.getDestiny());
     }
 
     @Override
     public void notifyFlightChange(Flight oldFlight, Flight newFlight) throws RemoteException {
         System.out.println("Your ticket changed to Flight " +
-                newFlight.getFlightCode() + "with destination " + newFlight.getDestiny()+
+                newFlight.getFlightCode() + " with destination " + newFlight.getDestiny()+
                 " from Flight " + oldFlight.getFlightCode() +
-                "with destination " + oldFlight.getDestiny());
+                " with destination " + oldFlight.getDestiny());
+
     }
 }

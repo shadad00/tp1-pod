@@ -44,7 +44,7 @@ public class PlaneCategoryInformation implements Serializable {
     public boolean containsColumn(Integer column){
         if(column == null)
             throw new IllegalArgumentException();
-        return column > 0 && column < columnsNumber;
+        return column >= 0 && column < columnsNumber;
     }
 
     public int getTotalSeats(){

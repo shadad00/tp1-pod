@@ -106,10 +106,13 @@ public class FlightAdministrationImpl implements FlightAdministration {
                             }else {
                                 cantMoved.getAndIncrement();
                                 Flight alternative = flightCentral.getFlight(alternatives.stream().sorted().collect(Collectors.toList()).get(0).getFlightCode());
-
-                                alternative.addTicket(ticket);
                                 oldFlight.deletePassengerTicket(ticket.getPassenger());
+                                ticket.clearSeat();
+                                alternative.addTicket(ticket);
                                 System.out.println("Moving" + ticket.getPassenger() + " to " + alternative.getFlightCode());
+
+                                flightCentral.notifyFlightChange(ticket.getPassenger(), oldFlight, alternative);
+
                             }
 
 
