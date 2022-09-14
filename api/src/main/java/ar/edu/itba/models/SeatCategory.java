@@ -10,6 +10,10 @@ public enum SeatCategory implements Serializable{
 
     private final String name;
 
+    public String getName() {
+        return name;
+    }
+
     SeatCategory (String name ){
         this.name = name;
     }
