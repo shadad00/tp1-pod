@@ -65,7 +65,7 @@ public class ClientSeatAssignation {
                         service.changeTicket(clientArguments.getPassenger(), clientArguments.getOriginalFlight(), clientArguments.getFlightCode());
                     }catch (IllegalArgumentException | IllegalStateException e){
                         System.out.println(e.getMessage());
-                    }
+                    }//TODO: check parameters to prevent null Pointer GASPAR (si le paso row=f1 y col=f2, se rompe todo)
                     break;
             }
 

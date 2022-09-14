@@ -30,14 +30,14 @@ public class ClientFlightNotification {
 
             final Notifier notifier = new NotifierImpl();
             final Remote remoteNotifier = UnicastRemoteObject.exportObject(notifier,0);
-
+//TODO: cortar el notification cuando sea necesario GASPAR (Exception en el server?)
 
 
 //            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
 //
 //            final FlightNotification service = (FlightNotification) registry.lookup(FlightNotification.class.getName());
             final FlightNotification service = (FlightNotification) Naming.lookup("//" + clientArguments.getAddress() + "/" + FlightNotification.class.getName());
-            service.registerUser(clientArguments.getFlightCode(), clientArguments.getPassenger(), notifier);//TODO Notifier
+            service.registerUser(clientArguments.getFlightCode(), clientArguments.getPassenger(), notifier);
 
 
         } catch (RemoteException re) {

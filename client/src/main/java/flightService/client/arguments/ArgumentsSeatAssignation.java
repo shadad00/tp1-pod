@@ -125,7 +125,6 @@ public class ArgumentsSeatAssignation{
             if(properties.containsKey(ORIGINAL_FLIGHT)){
 
                 this.originalFlight = properties.getProperty(ORIGINAL_FLIGHT);
-                //TODO seria newFlight? el original es el flight code que tenemos
             }else{
                 throw new IllegalArgumentException("Invalid argument for original flight");
             }

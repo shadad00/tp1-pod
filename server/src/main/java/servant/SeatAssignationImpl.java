@@ -25,7 +25,7 @@ public class SeatAssignationImpl implements SeatAssignation {
     public String isSeatFree(String flightCode, Integer row, Character col) throws RemoteException {
         Flight flight = flightCentral.getFlight(flightCode);
         if (flight == null) {
-            LOG.info("Flight does not exist");
+            LOG.info(String.format("Flight %s does not exist",flightCode));
             throw new IllegalArgumentException("Flight does not exist");
         }
         return flight.isSeatAvailable(row, fromColumnCharacter(col));
@@ -36,18 +36,18 @@ public class SeatAssignationImpl implements SeatAssignation {
     public void assignSeat(String flightCode, String passenger, Integer row, Character col) throws RemoteException, IllegalArgumentException, IllegalStateException {
         Flight flight = flightCentral.getFlight(flightCode);
         if(flight == null){
-            LOG.info("Flight does not exist");
+            LOG.info(String.format("Flight %s does not exist",flightCode));
             throw new IllegalArgumentException("Flight does not exist");
         }
 
         Ticket ticket = flight.getTicket(passenger);
         if(ticket == null){
-            LOG.info("Invalid passenger in this flight");
+            LOG.info(String.format("Invalid passenger %s in flight %s"),passenger,flightCode);
             throw new IllegalArgumentException("Invalid passenger in this flight");
         }
 
         if(ticket.hasSeat()) {
-            LOG.info("This passenger has a seat already assigned");
+            LOG.info(String.format("Passenger %s has a seat already assigned",passenger));
             throw new IllegalArgumentException("This passenger has a seat already assigned");
         }
 
@@ -61,54 +61,34 @@ public class SeatAssignationImpl implements SeatAssignation {
         }
         flightCentral.notifyAssignation(passenger,flightCentral.getFlight(flightCode));
 
-//                if (!assignSeatPrivate(flight,passenger,row, fromColumnCharacter(col) )) {
-//                    LOG.info("Couldn't assign passenger" + passenger + " to seat " + row + col);
-//                    throw new IllegalArgumentException("Couldn't assign passenger" + passenger + " to seat " + row + col);
-//                }
-
     }
-
-//    private boolean assignSeatPrivate(Flight flight, String passenger, Integer row, Integer col){
-////        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode))
-////                .orElseThrow(IllegalArgumentException::new);
-//        if(!flight.getStatus().equals(FlightStatus.PENDING))
-//            throw new IllegalArgumentException("Cannot assign seat to a flight that is not pending");
-//        Ticket passengerTicket = Optional.ofNullable(flight.getTicket(passenger))
-//                .orElseThrow(IllegalArgumentException::new);
-//        if(passengerTicket.hasSeat())
-//            throw new IllegalArgumentException("Invalid Seat");
-//
-//        return flight.assignSeat(passenger, row, col);
-//    }
-
 
     @Override
     public void movePassenger(String flightCode, String passenger, Integer row, Character col) throws RemoteException, IllegalArgumentException {
 
         Flight flight = flightCentral.getFlight(flightCode);
         if( flight == null){
-            LOG.info("Invalid Flight Code");
+            LOG.info(String.format("Flight %s does not exist",flightCode));
             throw new IllegalArgumentException("Invalid Flight Code");
         }
 
         Ticket passengerTicket = flight.getTicket(passenger);
         if(passengerTicket == null){
-            LOG.info("Invalid Passenger for this flight");
+            LOG.info(String.format("Invalid passenger %s in flight %s"),passenger,flightCode);
             throw new IllegalArgumentException("Invalid Passenger for this flight");
         }
 
         Seat oldSeat = passengerTicket.getSeat();
         if( oldSeat == null){
-            LOG.info("Passenger does not have a seat assigned");
+            LOG.info(String.format("Passenger %s does not have a seat assigned",passenger));
             throw new IllegalArgumentException("Passenger does not have a seat assigned");
         }
 
-        if(flight.isSeatAvailable(row, fromColumnCharacter(col)) != null) {
-            LOG.info("New seat is already taken");
-            throw new IllegalArgumentException("New seat is already taken");
-        }
-
         synchronized (flightCentral.getFlight(flightCode).getFlightCode()) {
+            if(flight.isSeatAvailable(row, fromColumnCharacter(col)) != null) {
+                LOG.info("New seat is already taken");
+                throw new IllegalArgumentException("New seat is already taken");
+            }
             try {
                 flight.freeSeatByPassenger(passengerTicket);
                 flight.assignSeat(passengerTicket, row, fromColumnCharacter(col));
@@ -116,7 +96,6 @@ public class SeatAssignationImpl implements SeatAssignation {
                 LOG.info(e.getMessage());
                 throw new IllegalArgumentException(e.getMessage());
             }
-//            assignSeatPrivate(flight, passenger, row, fromColumnCharacter(col));
         }
 
         flightCentral.notifySeatChange(passenger,oldSeat,flight);
@@ -138,17 +117,10 @@ public class SeatAssignationImpl implements SeatAssignation {
 
       }
 
-
-
-
-    @Override
+      @Override
     public void changeTicket(String passenger, String oldFlightCode, String newFlightCode) throws RemoteException {
-        LOG.info("old: " + oldFlightCode);
-        LOG.info("new: "  +newFlightCode);
-        LOG.info("passenger: " + passenger);
-
         if (oldFlightCode.equals(newFlightCode)) {
-            LOG.info("The flights are the same");
+            LOG.info("Change Ticket: flights are the same");
             throw new IllegalArgumentException("The flights are the same");
         }
         String min = oldFlightCode.compareTo(newFlightCode) < 0 ? oldFlightCode : newFlightCode;
@@ -156,40 +128,35 @@ public class SeatAssignationImpl implements SeatAssignation {
 
         Flight oldFlight = flightCentral.getFlight(oldFlightCode);
         if (oldFlight == null) {
-            LOG.info("Invalid old flight code");
+            LOG.info(String.format("Flight %s does not exist",oldFlightCode));
             throw new IllegalArgumentException("Invalid old flight code");
         }
 
         if(oldFlight.getStatus().equals(FlightStatus.CONFIRMED)){
-            LOG.info("Flight is already confirmed");
+            LOG.info(String.format("Flight %s is already confirmed",oldFlightCode));
             throw new IllegalArgumentException("Flight is already confirmed");
         }
-
-//        if( !oldFlight.passengerExists(passenger)){
-//            LOG.info("Passenger does not exist in this flight");
-//            throw new IllegalArgumentException("Passenger does not exist in this flight");
-//        }
 
         Flight newFlight = flightCentral.getFlight(newFlightCode);
 
         if (newFlight == null) {
-            LOG.info("Invalid new flight code");
+            LOG.info(String.format("Flight %s does not exist",newFlightCode));
             throw new IllegalArgumentException("Invalid new flight code");
         }
         Ticket oldTicket = oldFlight.getTicket(passenger);
         if(oldTicket == null){
-            LOG.info("Passenger does not exist in this flight");
+            LOG.info(String.format("Passenger %s does not exist in flight %s",passenger,oldFlight));
             throw new IllegalArgumentException("Passenger does not exist in this flight");
-        }
-        List<Flight> alternativeFlights = flightCentral
-                .getAlternativeFlights( oldTicket.getCategory(), oldFlight.getDestiny(),oldFlightCode);
-        if(!alternativeFlights.contains(newFlight)) {
-            LOG.info("Invalid new flight code");
-            throw new IllegalArgumentException("Invalid new flight code");
         }
 
         synchronized (flightCentral.getFlight(min).getFlightCode()){
             synchronized (flightCentral.getFlight(max).getFlightCode()){
+                List<Flight> alternativeFlights = flightCentral
+                        .getAlternativeFlights( oldTicket.getCategory(), oldFlight.getDestiny(),oldFlightCode);
+                if(!alternativeFlights.contains(newFlight)) {
+                    LOG.info("Invalid new flight code");
+                    throw new IllegalArgumentException("Invalid new flight code");
+                }
                 try {
                     oldFlight.deletePassengerTicket(passenger);
                     newFlight.addTicket(oldTicket);

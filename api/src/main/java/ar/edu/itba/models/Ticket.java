@@ -1,7 +1,5 @@
 package ar.edu.itba.models;
 
-import ar.edu.itba.models.utils.RowColumnPair;
-
 import java.io.Serializable;
 
 public class Ticket implements Serializable {
@@ -27,10 +25,6 @@ public class Ticket implements Serializable {
 
     }
 
-    public String getPassenger() {
-        return passenger;
-    }
-
     public synchronized Seat getSeat() {
             return seat;
 
@@ -43,6 +37,10 @@ public class Ticket implements Serializable {
 
     public void clearSeat(){
         assignSeat(null);
+    }
+
+    public String getPassenger() {
+        return passenger;
     }
 
 

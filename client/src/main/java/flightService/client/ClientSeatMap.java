@@ -5,6 +5,9 @@ import ar.edu.itba.remoteInterfaces.FlightNotification;
 import ar.edu.itba.remoteInterfaces.SeatMap;
 import flightService.client.arguments.ArgumentsSeatMap;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.AccessException;
 import java.rmi.Naming;
@@ -19,11 +22,8 @@ public class ClientSeatMap {
             ArgumentsSeatMap clientArguments = new ArgumentsSeatMap();
 
             // Parsing the arguments
-            try {
                 clientArguments.parseArguments();
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
+
 
 //            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
 //
@@ -43,8 +43,13 @@ public class ClientSeatMap {
                 output = service.getSeatMap(clientArguments.getFlightCode());
             }
 
-
-            System.out.println(output);
+            try {
+                FileWriter myObj = new FileWriter(clientArguments.getOutPath());
+                myObj.write(output);
+                myObj.close();
+            } catch (IOException e) {
+                System.out.println("An error occurred.");
+            }
 
         } catch (NotBoundException | RemoteException | IllegalArgumentException | MalformedURLException e) {
             System.out.println(e.getMessage());

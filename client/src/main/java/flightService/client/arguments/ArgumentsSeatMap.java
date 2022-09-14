@@ -82,13 +82,14 @@ public class ArgumentsSeatMap {
 
             this.outPath = properties.getProperty(OUT_PATH);
         }
-//        else{
-//            throw new IllegalArgumentException("Invalid argument for output path");
-//        }
-        //TODO: add outPath
+        else{
+            throw new IllegalArgumentException("Invalid argument for output path");
+        }
 
         if(properties.containsKey(CATEGORY)){
-
+            if (row!=null){
+                throw new IllegalArgumentException("Cannot filter by category and row");
+            }
             this.category = properties.getProperty(CATEGORY);
         }
 //        else{
