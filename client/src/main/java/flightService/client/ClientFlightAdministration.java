@@ -15,11 +15,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class ClientFlightAdministration {
 
@@ -56,12 +54,20 @@ public class ClientFlightAdministration {
                             service.getFlightStatus(clientArguments.getFlightCode()));
                     break;
                 case "confirm":
-                    service.confirmFlight(clientArguments.getFlightCode());
-                    System.out.println("Flight " + clientArguments.getFlightCode()  + " is confirmed");
+                    try {
+                        service.confirmFlight(clientArguments.getFlightCode());
+                        System.out.println("Flight " + clientArguments.getFlightCode()  + " is confirmed");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Flight " + clientArguments.getFlightCode() + " could not be confirmed");
+                    }
                     break;
                 case "cancel":
-                    service.cancelFlight(clientArguments.getFlightCode());
-                    System.out.println("Flight " + clientArguments.getFlightCode()  + " is cancelled");
+                    try {
+                        service.cancelFlight(clientArguments.getFlightCode());
+                        System.out.println("Flight " + clientArguments.getFlightCode()  + " is cancelled");
+                    }catch (IllegalArgumentException e){
+                        System.out.println("Flight " + clientArguments.getFlightCode()  + " could not be cancelled");
+                    }
                     break;
                 case "retticketing":
                     System.out.println(service.forceTicketChangeForCancelledFlights());
@@ -81,14 +87,20 @@ public class ClientFlightAdministration {
 
     //Boeing 787;BUSINESS#2#3,PREMIUM_ECONOMY#3#3,ECONOMY#20#10
     private static void parseModelsFile(List<String> file, FlightAdministration service) throws RemoteException {
+        int modelsAdded = 0;
         for(String line : file ) {
             String[] parse = line.split(";");
-            EnumMap<SeatCategory, RowColumnPair> seats = parseModels(parse[1]);
-            service.addPlaneModel(parse[0], seats);
+            try {
+                EnumMap<SeatCategory, RowColumnPair> seats = parseModels(parse[1]);
+                service.addPlaneModel(parse[0], seats);
+                modelsAdded++;
+            } catch (IllegalArgumentException e) {          //catches Model Already Exists, Invalid Seat Category, Invalid Rows/Columns
+                System.out.println("Cannot add model " + parse[0]);
+            }
 
         }
 
-        System.out.println(file.size() + " models registered\n");
+        System.out.println(modelsAdded + " models registered\n");
     }
 
     private static EnumMap<SeatCategory, RowColumnPair> parseModels(String modelLines) {
@@ -103,13 +115,19 @@ public class ClientFlightAdministration {
 
     //Boeing 787;AA100;JFK;BUSINESS#John,ECONOMY#Juliet,BUSINESS#Elizabeth
     private static void parseFlightsFile(List<String> file, FlightAdministration service) throws RemoteException {
+        int flightsAdded = 0;
         for(String line : file ) {
             String[] parse = line.split(";");
-            ConcurrentHashMap<String, Ticket> passengers = parseTickets(parse[3]);
-            service.addFlight(parse[0], parse[1], parse[2], passengers);
+            try {
+                ConcurrentHashMap<String, Ticket> passengers = parseTickets(parse[3]);
+                service.addFlight(parse[0], parse[1], parse[2], passengers);
+                flightsAdded++;
+            } catch (IllegalArgumentException e) {          //catches Flight Already Exists, Invalid Seat Category, Invalid Model
+                System.out.println("Cannot add flight " + parse[1]);
+            }
         }
 
-        System.out.println(file.size() + " Flights created\n");
+        System.out.println(flightsAdded + " Flights created\n");
     }
 
     private static ConcurrentHashMap<String, Ticket> parseTickets(String modelLines) {

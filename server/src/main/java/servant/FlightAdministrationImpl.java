@@ -75,7 +75,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
     @Override
     public void confirmFlight(String flightCode) throws RemoteException {
-        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
+        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
         synchronized (flight.getFlightCode()) {
             if (!flight.getStatus().equals(FlightStatus.PENDING))
                 throw new IllegalArgumentException();
@@ -86,10 +86,10 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
     @Override
     public void cancelFlight(String flightCode) throws RemoteException {
-        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(RemoteException::new);
+        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
         synchronized (flight.getFlightCode()) {
             if (!flight.getStatus().equals(FlightStatus.PENDING))
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Flight is not pending");
             flight.setStatus(FlightStatus.CANCELLED);
         }
         flightCentral.notifyCancellation(flight);
