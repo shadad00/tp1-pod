@@ -28,23 +28,44 @@ public class ClientSeatAssignation {
 
             switch (action) {
                 case "assign":
-                    service.assignSeat(clientArguments.getFlightCode(), clientArguments.getPassenger(), clientArguments.getRow(), clientArguments.getCol());
+                    try {
+                        service.assignSeat(clientArguments.getFlightCode(), clientArguments.getPassenger(), clientArguments.getRow(), clientArguments.getCol());
+                    }catch (IllegalArgumentException | IllegalStateException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case "status":
                     String passenger;
-                    if ( (passenger=service.isSeatFree(clientArguments.getFlightCode(), clientArguments.getRow(), clientArguments.getCol())) == null)
-                        System.out.printf("seat %d%c is free\n%n",clientArguments.getRow(),clientArguments.getCol() );
-                    else
-                        System.out.printf("seat %d%c is assigned to: %s\n%n",clientArguments.getRow(),clientArguments.getCol() ,passenger);
+                    try {
+                         passenger=service.isSeatFree(clientArguments.getFlightCode(), clientArguments.getRow(), clientArguments.getCol());
+                        if ( passenger == null)
+                            System.out.printf("seat %d%c is FREE\n%n",clientArguments.getRow(),clientArguments.getCol() );
+                        else
+                            System.out.printf("seat %d%c is ASSIGNED to: %s\n%n",clientArguments.getRow(),clientArguments.getCol() ,passenger);
+                    }catch (IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case "move":
-                    service.movePassenger(clientArguments.getFlightCode(), clientArguments.getPassenger(), clientArguments.getRow(), clientArguments.getCol());
+                    try {
+                        service.movePassenger(clientArguments.getFlightCode(), clientArguments.getPassenger(), clientArguments.getRow(), clientArguments.getCol());
+                    }catch (IllegalArgumentException | IllegalStateException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case "alternatives":
-                    System.out.println(service.checkAlternativeFlights(clientArguments.getFlightCode(), clientArguments.getPassenger()));
+                    try {
+                        System.out.println(service.checkAlternativeFlights(clientArguments.getFlightCode(), clientArguments.getPassenger()));
+                    }catch (IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case "changeTicket":
-                    service.changeTicket(clientArguments.getPassenger(), clientArguments.getOriginalFlight(), clientArguments.getFlightCode());
+                    try {
+                        service.changeTicket(clientArguments.getPassenger(), clientArguments.getOriginalFlight(), clientArguments.getFlightCode());
+                    }catch (IllegalArgumentException | IllegalStateException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
             }
 
@@ -54,6 +75,8 @@ public class ClientSeatAssignation {
             System.out.println("ERROR: Service not bound");
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        }catch (IllegalArgumentException | IllegalStateException e){
+            System.out.println(e.getMessage());
         }
 //        catch (MalformedURLException me) {
 //            System.out.println("ERROR: Malformed URL");

@@ -46,8 +46,8 @@ public class ClientSeatMap {
 
             System.out.println(output);
 
-        } catch (NotBoundException | RemoteException | MalformedURLException e) {
-            throw new RuntimeException(e);
+        } catch (NotBoundException | RemoteException | IllegalArgumentException | MalformedURLException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

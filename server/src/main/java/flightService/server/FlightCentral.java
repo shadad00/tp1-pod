@@ -100,13 +100,13 @@ public class FlightCentral implements FlightMonitor {
 
     public List<AlternativeFlight> getAlternatives(String flightCode, String passenger){
         Flight flight = Optional.ofNullable(getFlight(flightCode))
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("Flight does not exist"));
 
         if(flight.getStatus().equals(FlightStatus.CONFIRMED))
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Flight is already confirmed");
 
         Ticket ticket = Optional.ofNullable(flight.getTicket(passenger))
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("Passenger does not exist in this flight"));
 
         List<Flight> flights =  getAlternativeFlights( ticket.getCategory(), flight.getDestiny(),flightCode);
 

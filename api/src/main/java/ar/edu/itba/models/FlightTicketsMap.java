@@ -68,9 +68,9 @@ public class FlightTicketsMap implements Serializable {
     }
 
 
-    public Ticket assignSeat(Integer row, Integer col,Ticket ticket){
-        if(!contains(row, col))
-            throw new IllegalArgumentException();
+    public Ticket assignSeat(Integer row, Integer col,Ticket ticket) throws IllegalStateException{
+//        if(!contains(row, col))
+//            throw new IllegalArgumentException();
 
         // trato de asignarle el asiento pedido
         if (isSeatAvailable(row, col)) {
@@ -94,7 +94,8 @@ public class FlightTicketsMap implements Serializable {
             }
 
         }*/
-        return null;
+        throw new IllegalStateException("Seat is not available");
+        //TODO: chequear bien si es la forma correcta de informarlo
     }
 
     public void freeSeat(Integer row, Integer column){

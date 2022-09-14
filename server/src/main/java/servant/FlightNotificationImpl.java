@@ -41,6 +41,7 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
         if(flight == null || notifier == null
                 || passenger==null || flight.getStatus() == FlightStatus.CONFIRMED
                         || !flight.passengerExists(passenger)){
+            LOG.info("Flight not available for subscription for this user");
             throw new IllegalUserRegistration("Flight not available for subscription for this user");
         }
 
@@ -50,9 +51,9 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
 
         executor.submit(() -> {
             try {
-                System.out.println("Running on " + Thread.currentThread());
                 notifier.notifyRegistration(flight.getFlightCode(),flight.getDestiny());
             } catch (RemoteException e) {
+                LOG.info("Registration: Failed to callback with " + passenger + " registered at " + flight);
                 throw new RuntimeException(e);
             }
         });
@@ -63,34 +64,35 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
 
     @Override
     public void notifyConfirmation(Flight flight){
-        if(registeredUsers.contains(flight) ) {
+        LOG.info("Confirmation callbacks being processed");
+
+        if(registeredUsers.containsKey(flight) ) {
             for (Pair<String, Notifier> entries : registeredUsers.get(flight)) {
                 executor.submit(() -> {
                     try {
-                        System.out.println("Running on " + Thread.currentThread());
                         entries.getValue().notifyConfirmation(flight.getFlightCode(), flight.getDestiny()
                                 , flight.getTicket(entries.getKey()).getSeat());
                     } catch (RemoteException e) {
+                        LOG.info("Confirmation: Failed to callback with " + entries.getKey() + " registered at " + flight);
                         throw new RuntimeException(e);
                     }
                 });
             }
-
         }
     }
 
     @Override
     public void notifyCancellation(Flight flight) {
-        if(registeredUsers.contains(flight)){
+        LOG.info("Cancellation flight callbacks being processed");
+
+        if(registeredUsers.containsKey(flight)){
             for (Pair<String, Notifier> entries : registeredUsers.get(flight)) {
                 executor.submit(() -> {
                     try {
-                        System.out.println("Running on " + Thread.currentThread());
                         entries.getValue().notifyCancellation(flight.getFlightCode(), flight.getDestiny()
                                 , flight.getTicket(entries.getKey()).getSeat());
                     } catch (RemoteException e) {
                         LOG.info("Cancellation: Failed to callback with " + entries.getKey() + " registered at " + flight);
-
                         throw new RuntimeException(e);
                     }
                 });
@@ -100,19 +102,20 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
 
     @Override
     public void notifyAssignation(String passenger, Flight flight) {
+        LOG.info("Assignation Callbacks being processed");
 
-        if(registeredUsers.contains(flight))
+        if(registeredUsers.containsKey(flight))
             {
+                LOG.info("contains user");
                 for (Pair<String, Notifier> entries : registeredUsers.get(flight)) {
                     if (!entries.getKey().equals(passenger))
                         continue;
                     executor.submit(() -> {
                         try {
-                            System.out.println("Running on " + Thread.currentThread());
                             entries.getValue().notifyAssignation(flight.getFlightCode()
                                     , flight.getDestiny(), flight.getTicket(passenger).getSeat());
                         } catch (RemoteException e) {
-                            LOG.info("Assignation: failed to callback with " + passenger + " registered at " + flight);
+                            LOG.info("Assignation: Failed to callback with " + passenger + " registered at " + flight);
                             throw new RuntimeException(e);
                         }
                     });
@@ -123,16 +126,17 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
 
     @Override
     public void notifySeatChange(String passenger, Seat originalSeat, Flight flight){
-        if(registeredUsers.contains(flight)) {
+        LOG.info("Seat change callbacks being processed");
+
+        if(registeredUsers.containsKey(flight)) {
             for (Pair<String, Notifier> entries : registeredUsers.get(flight)) {
                 if (!entries.getKey().equals(passenger))
                     continue;
                 executor.submit(() -> {
                     try {
-                        System.out.println("Running on " + Thread.currentThread());
                         entries.getValue().notifySeatChange(passenger, originalSeat, flight);
                     } catch (RemoteException e) {
-                        LOG.info("Seat change: failed to callback with " + passenger + " registered at " + flight);
+                        LOG.info("Seat change: Failed to callback with " + passenger + " registered at " + flight);
                         throw new RuntimeException(e);
                     }
                 });
@@ -143,7 +147,9 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
 
     @Override
     public void notifyFlightChange(String passenger, Flight oldFlight, Flight newFlight) {
-        if(registeredUsers.contains(oldFlight)){
+        LOG.info("Flight change callbacks being processed");
+
+        if(registeredUsers.containsKey(oldFlight)){
             for (Pair<String, Notifier> entries : registeredUsers.get(oldFlight)) {
                 if (!entries.getKey().equals(passenger))
                     continue;

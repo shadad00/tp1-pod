@@ -50,15 +50,19 @@ public class ClientFlightAdministration {
                     parseFlightsFile(flights, service);
                     break;
                 case "status":
-                    System.out.println("Flight " + clientArguments.getFlightCode()  + " is " +
-                            service.getFlightStatus(clientArguments.getFlightCode()));
+                    try {
+                        System.out.println("Flight " + clientArguments.getFlightCode()  + " is " +
+                                service.getFlightStatus(clientArguments.getFlightCode()));
+                    }catch (IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case "confirm":
                     try {
                         service.confirmFlight(clientArguments.getFlightCode());
                         System.out.println("Flight " + clientArguments.getFlightCode()  + " is confirmed");
                     } catch (IllegalArgumentException e) {
-                        System.out.println("Flight " + clientArguments.getFlightCode() + " could not be confirmed");
+                        System.out.println(e.getMessage());
                     }
                     break;
                 case "cancel":
@@ -66,7 +70,7 @@ public class ClientFlightAdministration {
                         service.cancelFlight(clientArguments.getFlightCode());
                         System.out.println("Flight " + clientArguments.getFlightCode()  + " is cancelled");
                     }catch (IllegalArgumentException e){
-                        System.out.println("Flight " + clientArguments.getFlightCode()  + " could not be cancelled");
+                        System.out.println(e.getMessage());
                     }
                     break;
                 case "retticketing":
@@ -91,11 +95,11 @@ public class ClientFlightAdministration {
         for(String line : file ) {
             String[] parse = line.split(";");
             try {
-                EnumMap<SeatCategory, RowColumnPair> seats = parseModels(parse[1]);
+                EnumMap<SeatCategory, RowColumnPair> seats = parseModels(parse[1], parse[0]);
                 service.addPlaneModel(parse[0], seats);
                 modelsAdded++;
             } catch (IllegalArgumentException e) {          //catches Model Already Exists, Invalid Seat Category, Invalid Rows/Columns
-                System.out.println("Cannot add model " + parse[0]);
+                System.out.println(e.getMessage());
             }
 
         }
@@ -103,12 +107,21 @@ public class ClientFlightAdministration {
         System.out.println(modelsAdded + " models registered\n");
     }
 
-    private static EnumMap<SeatCategory, RowColumnPair> parseModels(String modelLines) {
+    private static EnumMap<SeatCategory, RowColumnPair> parseModels(String modelLines, String model) {
         EnumMap<SeatCategory, RowColumnPair> seatsCategory = new EnumMap<>(SeatCategory.class);
         for (String s : modelLines.split(",")) {
             String[] categoryEntry = s.split("#");
-            seatsCategory.put(SeatCategory.valueOf(categoryEntry[0]),new RowColumnPair(
-                    Integer.parseInt(categoryEntry[1]), Integer.parseInt(categoryEntry[2])));
+            boolean added = false;
+            for (SeatCategory value : SeatCategory.values()) {
+                if (categoryEntry[0].equals(value.toString())) {
+                    seatsCategory.put(SeatCategory.valueOf(categoryEntry[0]),new RowColumnPair(
+                            Integer.parseInt(categoryEntry[1]), Integer.parseInt(categoryEntry[2])));
+                    added=true;
+                }
+            }
+            if (!added)
+                throw new IllegalArgumentException("Cannot add model " + model);
+
         }
         return seatsCategory;
     }
@@ -119,23 +132,31 @@ public class ClientFlightAdministration {
         for(String line : file ) {
             String[] parse = line.split(";");
             try {
-                ConcurrentHashMap<String, Ticket> passengers = parseTickets(parse[3]);
+                ConcurrentHashMap<String, Ticket> passengers = parseTickets(parse[3], parse[0]);
                 service.addFlight(parse[0], parse[1], parse[2], passengers);
                 flightsAdded++;
             } catch (IllegalArgumentException e) {          //catches Flight Already Exists, Invalid Seat Category, Invalid Model
-                System.out.println("Cannot add flight " + parse[1]);
+                System.out.println(e.getMessage());
             }
         }
 
         System.out.println(flightsAdded + " Flights created\n");
     }
 
-    private static ConcurrentHashMap<String, Ticket> parseTickets(String modelLines) {
+    private static ConcurrentHashMap<String, Ticket> parseTickets(String modelLines, String flightCode) {
         ConcurrentHashMap<String, Ticket> tickets = new ConcurrentHashMap<>();
         for (String s : modelLines.split(",")) {
             String[] categoryEntry = s.split("#");
-            tickets.put(categoryEntry[1],
-                    new Ticket(categoryEntry[1],SeatCategory.valueOf(categoryEntry[0])));
+            boolean added = false;
+            for (SeatCategory value : SeatCategory.values()) {
+                if (categoryEntry[0].equals(value.toString())) {
+                    tickets.put(categoryEntry[1],
+                            new Ticket(categoryEntry[1],SeatCategory.valueOf(categoryEntry[0])));
+                    added=true;
+                }
+            }
+            if (!added)
+                throw new IllegalArgumentException("Cannot add flight "+ flightCode);
         }
         return tickets;
     }

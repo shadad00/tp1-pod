@@ -3,6 +3,8 @@ package servant;
 import ar.edu.itba.models.*;
 import ar.edu.itba.remoteInterfaces.SeatMap;
 import flightService.server.FlightCentral;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.Optional;
  * | 07 A * | 07 B * | 07 C * | 07 D * | 07 E * | ECONOMY
  */
 public class SeatMapImpl implements SeatMap {
+    private static final Logger LOG = LoggerFactory.getLogger(SeatMapImpl.class);
     private final FlightCentral flightCentral;
 
     public SeatMapImpl(FlightCentral flightCentral) {
@@ -35,7 +38,12 @@ public class SeatMapImpl implements SeatMap {
 
     @Override
     public String getSeatMapByCategory(String flightCode, SeatCategory category) throws RemoteException {
-        Flight flight = Optional.ofNullable(this.flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
+        Flight flight = this.flightCentral.getFlight(flightCode);
+        if(flight == null){
+            LOG.info("Flight does not exist");
+            throw new IllegalArgumentException("Flight does not exist");
+        }
+
         StringBuilder answer = new StringBuilder();
         FlightTicketsMap categorySeats = flight.getFlightTicketsMapByCategory(category);
         if (categorySeats != null) {
@@ -50,10 +58,17 @@ public class SeatMapImpl implements SeatMap {
 
     @Override
     public String getSeatMapByRow(String flightCode, int row) throws RemoteException {
-        Flight flight = Optional.ofNullable(this.flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
+        Flight flight = this.flightCentral.getFlight(flightCode);
+        if(flight == null){
+            LOG.info("Flight does not exist");
+            throw new IllegalArgumentException("Flight does not exist");
+        }
+
         SeatCategory category;
-        if((category = flight.getCategoryFromRow(row)) == null)
-            throw new IllegalArgumentException();
+        if((category = flight.getCategoryFromRow(row)) == null) {
+            LOG.info("Row does not belong to any category");
+            throw new IllegalArgumentException("Row does not belong to any category");
+        }
         return getSeatMapByRowWithCategory(flight,row,category);
     }
 

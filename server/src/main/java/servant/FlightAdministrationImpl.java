@@ -43,12 +43,12 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
         if(totalRows <= 0) {
             LOG.info("Invalid rows and columns");
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Cannot add model "+ model);
         }
         synchronized (mutex_models) {
             if (flightCentral.getModels(model) != null) {
                 LOG.info("Model already exists");
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Cannot add model "+ model);
             }
             flightCentral.addModel(model, new Plane(model, categoryDescriptors));
         }
@@ -60,7 +60,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
             if (!flightCentral.modelExists(modelName)
                     || flightCentral.flightExists(flightCode)) {
                 LOG.info("model or flight already exists " + modelName + " " + flightCode);
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Cannot add flight " + flightCode);
             }
 
             flightCentral.addFlight(flightCode, new Flight(flightCode, destinationAirportCode, flightCentral.getModels(modelName), tickets));
@@ -70,15 +70,21 @@ public class FlightAdministrationImpl implements FlightAdministration {
     @Override
     public FlightStatus getFlightStatus(String flightCode) throws RemoteException {
         return Optional.ofNullable(flightCentral.getFlight(flightCode))
-                .orElseThrow(IllegalArgumentException::new).getStatus();
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Flight Code")).getStatus();
     }
 
     @Override
     public void confirmFlight(String flightCode) throws RemoteException {
-        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
+        Flight flight = flightCentral.getFlight(flightCode);
+        if (flight == null) {
+            LOG.info("Invalid flight code");
+            throw new IllegalArgumentException("Invalid Flight Code");
+        }
         synchronized (flight.getFlightCode()) {
-            if (!flight.getStatus().equals(FlightStatus.PENDING))
-                throw new IllegalArgumentException();
+            if (!flight.getStatus().equals(FlightStatus.PENDING)){
+                LOG.info("Flight is not pending");
+                throw new IllegalArgumentException("Flight is not pending");
+            }
             flight.setStatus(FlightStatus.CONFIRMED);
         }
         flightCentral.notifyConfirmation(flight);
@@ -86,10 +92,17 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
     @Override
     public void cancelFlight(String flightCode) throws RemoteException {
-        Flight flight = Optional.ofNullable(flightCentral.getFlight(flightCode)).orElseThrow(IllegalArgumentException::new);
+        Flight flight = flightCentral.getFlight(flightCode);
+        if (flight == null) {
+            LOG.info("Invalid flight code");
+            throw new IllegalArgumentException("Invalid Flight Code");
+        }
+
         synchronized (flight.getFlightCode()) {
-            if (!flight.getStatus().equals(FlightStatus.PENDING))
+            if (!flight.getStatus().equals(FlightStatus.PENDING)){
+                LOG.info("Flight is not pending");
                 throw new IllegalArgumentException("Flight is not pending");
+            }
             flight.setStatus(FlightStatus.CANCELLED);
         }
         flightCentral.notifyCancellation(flight);
@@ -115,7 +128,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
                                                 if (alternatives.isEmpty()) {
                                                     LOG.info("No alternatives for " + ticket.getPassenger() + " to " + oldFlight.getDestiny());
-                                                    sb.append("Cannot find alternative flight for").append(ticket.getPassenger()).append(" to ").append(oldFlight.getDestiny()).append("\n");
+                                                    sb.append("Cannot find alternative flight for ").append(ticket.getPassenger()).append(" to ").append(oldFlight.getDestiny()).append("\n");
                                                 } else {
                                                     cantMoved.getAndIncrement();
                                                     List<Flight> collect = alternatives.stream().sorted().map((alt) -> flightCentral.getFlight(alt.getFlightCode())).collect(Collectors.toList());
@@ -128,14 +141,14 @@ public class FlightAdministrationImpl implements FlightAdministration {
                                                                     oldFlight.deletePassengerTicket(ticket.getPassenger());
                                                                     ticket.clearSeat();
                                                                     flight.addTicket(ticket);
-                                                                    LOG.info("Moving" + ticket.getPassenger() + " to " + flight.getFlightCode());
+                                                                    LOG.info("Moving " + ticket.getPassenger() + " to " + flight.getFlightCode());
                                                                     aux=flight;
                                                                     break;
                                                             }
                                                         }
                                                     }
 
-                                                    if(aux != null)
+                                                    if(aux == null)
                                                         sb.append("Cannot find alternative flight for").append(ticket.getPassenger()).append(" to ").append(oldFlight.getDestiny()).append("\n");
                                                     else flightCentral.notifyFlightChange(ticket.getPassenger(),oldFlight,aux);
 

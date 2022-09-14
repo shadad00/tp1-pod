@@ -91,27 +91,46 @@ public class Flight implements Serializable {
 
 
 
-    public boolean assignSeat(String passenger, Integer row, Integer col){
-        Ticket ticket;
-        if(status != FlightStatus.PENDING
-            || (ticket=Optional.ofNullable(tickets.get(passenger))
+    public void assignSeat(Ticket ticket, Integer row, Integer col) throws IllegalStateException{
+        if(!this.getStatus().equals(FlightStatus.PENDING))
+            throw new IllegalArgumentException("Cannot assign seat to a flight that is not pending");
+        //Ticket ticket = Optional.ofNullable(this.getTicket(passenger))
+        //        .orElseThrow(() -> new IllegalArgumentException("Invalid passenger in this flight"));
+        /*
+Ticket ticket;
+        if((ticket=Optional.ofNullable(tickets.get(passenger))
                 .orElseThrow(IllegalArgumentException::new))
                 .hasSeat())
-            throw new IllegalArgumentException(); //para asignar un asiento solo debe estar pendiente el vuelo
+            throw new IllegalArgumentException("Cant assign seat to a flight that is not pending "); //para asignar un asiento solo debe estar pendiente el vuelo
+*/
 
 
         for(Map.Entry<SeatCategory, FlightTicketsMap> entry: flightSeatsMap.entrySet()) {
             // si el asiento es de menor o igual categoria que la del ticket comprado
-            if (/*entry.getKey().compareTo(ticket.getCategory())>=0*/ entry.getKey().ordinal() >= ticket.getCategory().ordinal() && entry.getValue().contains(row, col)) {
-                return entry.getValue().assignSeat(row, col, ticket) != null;
+
+            if(entry.getValue().contains(row, col)){
+                if(entry.getKey().ordinal() >= ticket.getCategory().ordinal()){
+                    entry.getValue().assignSeat(row, col, ticket);
+//                    ticket.assignSeat(entry.getValue().getSeat(row, col));
+                    return;
+                }
+                else
+                    throw new IllegalArgumentException("Cannot assign a seat of a higher category than the ticket");
+
             }
+
+//            if (entry.getKey().ordinal() >= ticket.getCategory().ordinal() && entry.getValue().contains(row, col)) {
+//                entry.getValue().assignSeat(row, col, ticket);
+//                return;
+//            }
         }
-        return false;
+        throw new IllegalArgumentException("Invalid seat");
+//        return false;
     }
 
-    public void freeSeatByPassenger(String passengerName){
-        Ticket ticket = Optional.ofNullable(tickets.get(passengerName))
-                .orElseThrow(IllegalArgumentException::new);
+    public void freeSeatByPassenger(Ticket ticket){
+        //Ticket ticket = Optional.ofNullable(tickets.get(passengerName))
+        //        .orElseThrow(IllegalArgumentException::new);
         if(ticket.hasSeat()){
             flightSeatsMap.get( ticket.getSeat().getCategory() )
                     .freeSeat(ticket.getSeat().getRow(), ticket.getSeat().getColumn());
@@ -127,7 +146,7 @@ public class Flight implements Serializable {
     public Ticket deletePassengerTicket(String passenger){
         Ticket ticket = Optional.ofNullable(tickets.get(passenger))
                 .orElseThrow(IllegalArgumentException::new);
-        freeSeatByPassenger(passenger);
+        freeSeatByPassenger(ticket);
         tickets.remove(passenger);
         return ticket;
     }

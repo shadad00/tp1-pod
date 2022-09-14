@@ -44,12 +44,12 @@ public class ClientFlightNotification {
             System.out.println("ERROR: Exception in the remote server");
         } catch (NotBoundException nbe) {
             System.out.println("ERROR: Service not bound");
+        } catch (RuntimeException | IllegalUserRegistration | MalformedURLException re) {
+            System.out.println(re.getMessage());
         }
 //        catch (MalformedURLException me) {
 //            System.out.println("ERROR: Malformed URL");
 //        }
-        catch (IllegalUserRegistration | MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 }
