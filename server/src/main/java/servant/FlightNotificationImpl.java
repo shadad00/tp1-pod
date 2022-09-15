@@ -77,7 +77,10 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
                         throw new RuntimeException(e);
                     }
                 });
+
             }
+            registeredUsers.remove(flight);
+
         }
     }
 
@@ -162,6 +165,12 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
                         throw new RuntimeException(e);
                     }
                 });
+                //registeredUsers.get(oldFlight).remove(entries);
+                registeredUsers.putIfAbsent(newFlight, Collections.synchronizedList(new ArrayList<>()));
+//                if(!registeredUsers.containsKey(newFlight)){
+//                    registeredUsers.put(newFlight, new ArrayList<>());
+//                }
+                registeredUsers.get(newFlight).add(entries);
 
             }
         }

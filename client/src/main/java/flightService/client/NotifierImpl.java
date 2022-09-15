@@ -19,6 +19,7 @@ public class NotifierImpl implements Notifier {
            output+=" and your seat is " +
         currentSeat.getCategory() + " " + currentSeat.getRow() + currentSeat.getCharColumn() + " .";
         System.out.println( output);
+        System.exit(0);
     }
 
     @Override
