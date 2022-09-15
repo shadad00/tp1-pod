@@ -48,20 +48,20 @@ Para ejecutar el cliente de administracion de vuelos
 ```
 Para ejecutar el cliente de asignacion de asientos
 ```
-./client/target/tp1-g14-client-1.0-SNAPSHOT/run-admin -DserverAddress=xx.xx.xx.xx:yyyy 
+./client/target/tp1-g14-client-1.0-SNAPSHOT/run-seatAssign -DserverAddress=xx.xx.xx.xx:yyyy 
 -Daction=actionName -Dflight=flightCode [ -Dpassenger=name | -Drow=num | -Dcol=L | 
 -DoriginalFlight=originFlightCode ]
 ```
 
-Para ejecutar el cliente de asignacion de asientos
+Para ejecutar el cliente de Mapa de asientos
 ```
-./client/target/tp1-g14-client-1.0-SNAPSHOT/run-admin -DserverAddress=xx.xx.xx.xx:yyyy 
+./client/target/tp1-g14-client-1.0-SNAPSHOT/run-seatMap -DserverAddress=xx.xx.xx.xx:yyyy 
 -Dflight=flightCode [ -Dcategory=catName | -Drow=rowNumber ] -DoutPath=output.csv
 ```
 
-Para ejecutar el cliente de asignacion de asientos
+Para ejecutar el cliente de notificacion de usuarios
 ```
-./client/target/tp1-g14-client-1.0-SNAPSHOT/run-admin -DserverAddress=xx.xx.xx.xx:yyyy 
+./client/target/tp1-g14-client-1.0-SNAPSHOT/run-notifications -DserverAddress=xx.xx.xx.xx:yyyy 
 -Dflight=flightCode -Dpassenger=name
 ```
 
@@ -70,3 +70,5 @@ Para ejecutar el cliente de asignacion de asientos
 * **Gaspar Budó Berra**
 * **Bruno Squillari**
 * **Facundo Zimbimbakis**
+* **Santiago Hadad**
+* **Marcos Dedeu**
