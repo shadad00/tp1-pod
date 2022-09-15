@@ -42,7 +42,7 @@ public class SeatAssignationImpl implements SeatAssignation {
 
         Ticket ticket = flight.getTicket(passenger);
         if(ticket == null){
-            LOG.info(String.format("Invalid passenger %s in flight %s"),passenger,flightCode);
+            LOG.info("Invalid passenger " + passenger +" in flight " + flightCode);
             throw new IllegalArgumentException("Invalid passenger in this flight");
         }
 
@@ -74,7 +74,7 @@ public class SeatAssignationImpl implements SeatAssignation {
 
         Ticket passengerTicket = flight.getTicket(passenger);
         if(passengerTicket == null){
-            LOG.info(String.format("Invalid passenger %s in flight %s"),passenger,flightCode);
+            LOG.info("Invalid passenger " + passenger +" in flight " + flightCode);
             throw new IllegalArgumentException("Invalid Passenger for this flight");
         }
 
@@ -152,7 +152,7 @@ public class SeatAssignationImpl implements SeatAssignation {
         synchronized (flightCentral.getFlight(min).getFlightCode()){
             synchronized (flightCentral.getFlight(max).getFlightCode()){
                 List<Flight> alternativeFlights = flightCentral
-                        .getAlternativeFlights( oldTicket.getCategory(), oldFlight.getDestiny(),oldFlightCode);
+                        .getAlternativeFlights(oldFlight.getDestiny(),oldFlightCode);
                 if(!alternativeFlights.contains(newFlight)) {
                     LOG.info("Invalid new flight code");
                     throw new IllegalArgumentException("Invalid new flight code");

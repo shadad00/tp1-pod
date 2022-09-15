@@ -41,7 +41,6 @@ public class NotifierImpl implements Notifier {
 
     @Override
     public void notifyAssignation(String flightCode, String destination, Seat currentSeat) throws RemoteException {
-        System.out.println("seat " + currentSeat);
         System.out.println("Your seat is " +
                 currentSeat.getCategory() + " " +
                 currentSeat.getRow() +

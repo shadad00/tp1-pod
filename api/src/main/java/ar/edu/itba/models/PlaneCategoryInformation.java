@@ -47,8 +47,4 @@ public class PlaneCategoryInformation implements Serializable {
         return column >= 0 && column < columnsNumber;
     }
 
-    public int getTotalSeats(){
-        return (finalRow - initialRow + 1) * columnsNumber;
-    }
-
 }

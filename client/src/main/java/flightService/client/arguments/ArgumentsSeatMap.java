@@ -4,13 +4,11 @@ package flightService.client.arguments;
 import java.util.Properties;
 
 public class ArgumentsSeatMap {
-    private String serverAddress;
     private String flightCode;
     private String category;
-    private String row;
+    private Integer row;
     private String outPath;
     private String address;
-    private int port;
 
 
     private static final String SERVER="serverAddress";
@@ -20,13 +18,6 @@ public class ArgumentsSeatMap {
     private static final String CATEGORY="category";
 
 
-    public String getServerAddress() {
-        return serverAddress;
-    }
-
-    public Integer getPort(){
-        return port;
-    }
 
     public String getAddress(){
         return address;
@@ -40,7 +31,7 @@ public class ArgumentsSeatMap {
         return category;
     }
 
-    public String getRow() {
+    public Integer getRow() {
         return row;
     }
 
@@ -54,11 +45,8 @@ public class ArgumentsSeatMap {
 
 
         if(properties.containsKey(SERVER)){
-            this.serverAddress = properties.getProperty(SERVER);
+            this.address = properties.getProperty(SERVER);
 
-            String[] strings = serverAddress.split(":");
-            address = strings[0];
-            port = Integer.parseInt(strings[1]);
         }else{
             throw new IllegalArgumentException("Invalid argument for server address");
         }
@@ -72,11 +60,9 @@ public class ArgumentsSeatMap {
 
         if(properties.containsKey(ROW)){
 
-            this.row = properties.getProperty(ROW);
+            this.row = Integer.parseInt(properties.getProperty(ROW));
+
         }
-//        else{
-//            throw new IllegalArgumentException("Invalid argument for row");
-//        }
 
         if(properties.containsKey(OUT_PATH)){
 
@@ -92,9 +78,6 @@ public class ArgumentsSeatMap {
             }
             this.category = properties.getProperty(CATEGORY);
         }
-//        else{
-//            throw new IllegalArgumentException("Invalid argument for category");
-//        }
 
 
     }

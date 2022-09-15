@@ -2,10 +2,6 @@ package flightService.server;
 
 import ar.edu.itba.models.*;
 import ar.edu.itba.models.utils.AlternativeFlight;
-import ar.edu.itba.remoteInterfaces.FlightAdministration;
-import ar.edu.itba.remoteInterfaces.SeatAssignation;
-import ar.edu.itba.remoteInterfaces.SeatMap;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -17,14 +13,10 @@ public class FlightCentral implements FlightMonitor {
 
     //modelos -> aviones
     private final ConcurrentHashMap<String, Plane> models;
-    public static final String mutex_system = "mutex_cancellation";
 
     private FlightMonitor internalNotifier;
-//    private final  FlightAdministration internalAdmin;
-//    private final  SeatAssignation internalAssignation;
-//    private final  SeatMap internalSeatMap;
 
-    private final String mutex_notificator = "mutex_notificator";
+    private final static String mutex_notificator = "mutex_notificator";
 
 
 
@@ -54,13 +46,13 @@ public class FlightCentral implements FlightMonitor {
         return models.get(model);
     }
 
-    public Flight addFlight(String flightCode, Flight newFlight){
-        return flights.putIfAbsent(flightCode, newFlight);
+    public void addFlight(String flightCode, Flight newFlight){
+        flights.putIfAbsent(flightCode, newFlight);
     }
 
 
-    public Plane addModel(String modelName, Plane plane){
-        return models.putIfAbsent(modelName, plane);
+    public void addModel(String modelName, Plane plane){
+        models.putIfAbsent(modelName, plane);
     }
 
     public boolean flightExists(String flightCode){
@@ -72,7 +64,7 @@ public class FlightCentral implements FlightMonitor {
     }
 
 
-    public List<Flight> getAlternativeFlights(SeatCategory category, String destiny, String selfFlightCode){
+    public List<Flight> getAlternativeFlights( String destiny, String selfFlightCode){
         return flights.values().stream()
                     .filter(
                             flight -> !flight.getFlightCode().equals(selfFlightCode)
@@ -108,7 +100,7 @@ public class FlightCentral implements FlightMonitor {
         Ticket ticket = Optional.ofNullable(flight.getTicket(passenger))
                 .orElseThrow(() -> new IllegalArgumentException("Passenger does not exist in this flight"));
 
-        List<Flight> flights =  getAlternativeFlights( ticket.getCategory(), flight.getDestiny(),flightCode);
+        List<Flight> flights =  getAlternativeFlights(flight.getDestiny(),flightCode);
 
         List<AlternativeFlight> alternativeFlights = new ArrayList<>();
 

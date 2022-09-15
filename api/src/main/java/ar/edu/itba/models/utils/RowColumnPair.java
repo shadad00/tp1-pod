@@ -3,8 +3,8 @@ package ar.edu.itba.models.utils;
 import java.io.Serializable;
 
 public class RowColumnPair implements Serializable {
-    private Integer row;
-    private Integer column;
+    private final Integer row;
+    private final Integer column;
 
     public RowColumnPair(Integer row, Integer column) {
         this.row = row;
@@ -15,15 +15,9 @@ public class RowColumnPair implements Serializable {
         return row;
     }
 
-    public void setRow(Integer row) {
-        this.row = row;
-    }
 
     public Integer getColumn() {
         return column;
     }
 
-    public void setColumn(Integer column) {
-        this.column = column;
-    }
 }

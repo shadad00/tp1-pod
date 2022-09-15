@@ -13,11 +13,8 @@ import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class ClientFlightAdministration {
 
@@ -25,16 +22,10 @@ public class ClientFlightAdministration {
         try {
             ArgumentsFlightAdministration clientArguments = new ArgumentsFlightAdministration();
 
-            // Parsing the arguments
-            try {
-                clientArguments.parseArguments();
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
+            clientArguments.parseArguments();
 
-//            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
+
             final FlightAdministration service = (FlightAdministration) Naming.lookup("//" + clientArguments.getAddress() + "/" + FlightAdministration.class.getName());
-//            final FlightAdministration service = (FlightAdministration) registry.lookup("123");
 
             String action = clientArguments.getAction();
 
@@ -86,10 +77,11 @@ public class ClientFlightAdministration {
             System.out.println("ERROR: Malformed URL");
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    //Boeing 787;BUSINESS#2#3,PREMIUM_ECONOMY#3#3,ECONOMY#20#10
     private static void parseModelsFile(List<String> file, FlightAdministration service) throws RemoteException {
         int modelsAdded = 0;
         for(String line : file ) {
@@ -98,7 +90,7 @@ public class ClientFlightAdministration {
                 EnumMap<SeatCategory, RowColumnPair> seats = parseModels(parse[1], parse[0]);
                 service.addPlaneModel(parse[0], seats);
                 modelsAdded++;
-            } catch (IllegalArgumentException e) {          //catches Model Already Exists, Invalid Seat Category, Invalid Rows/Columns
+            } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
 
@@ -126,7 +118,6 @@ public class ClientFlightAdministration {
         return seatsCategory;
     }
 
-    //Boeing 787;AA100;JFK;BUSINESS#John,ECONOMY#Juliet,BUSINESS#Elizabeth
     private static void parseFlightsFile(List<String> file, FlightAdministration service) throws RemoteException {
         int flightsAdded = 0;
         for(String line : file ) {
@@ -135,7 +126,7 @@ public class ClientFlightAdministration {
                 ConcurrentHashMap<String, Ticket> passengers = parseTickets(parse[3], parse[0]);
                 service.addFlight(parse[0], parse[1], parse[2], passengers);
                 flightsAdded++;
-            } catch (IllegalArgumentException e) {          //catches Flight Already Exists, Invalid Seat Category, Invalid Model
+            } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
         }

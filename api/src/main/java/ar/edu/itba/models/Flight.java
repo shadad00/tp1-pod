@@ -115,12 +115,11 @@ public class Flight implements Serializable {
         return tickets.containsKey(passenger);
     }
 
-    public Ticket deletePassengerTicket(String passenger){
+    public void deletePassengerTicket(String passenger){
         Ticket ticket = Optional.ofNullable(tickets.get(passenger))
                 .orElseThrow(IllegalArgumentException::new);
         freeSeatByPassenger(ticket);
         tickets.remove(passenger);
-        return ticket;
     }
 
     public Collection<Ticket> getTickets() {

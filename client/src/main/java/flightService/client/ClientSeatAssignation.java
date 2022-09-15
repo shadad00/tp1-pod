@@ -14,14 +14,8 @@ public class ClientSeatAssignation {
             ArgumentsSeatAssignation clientArguments = new ArgumentsSeatAssignation();
 
             // Parsing the arguments
-            try {
-                clientArguments.parseArguments();
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
+            clientArguments.parseArguments();
 
-//            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
-//            final SeatAssignation service = (SeatAssignation) registry.lookup(SeatAssignation.class.getName());
             final SeatAssignation service = (SeatAssignation) Naming.lookup("//" + clientArguments.getAddress() + "/" + SeatAssignation.class.getName());
 
             String action = clientArguments.getAction();
@@ -65,7 +59,7 @@ public class ClientSeatAssignation {
                         service.changeTicket(clientArguments.getPassenger(), clientArguments.getOriginalFlight(), clientArguments.getFlightCode());
                     }catch (IllegalArgumentException | IllegalStateException e){
                         System.out.println(e.getMessage());
-                    }//TODO: check parameters to prevent null Pointer GASPAR (si le paso row=f1 y col=f2, se rompe todo)
+                    }
                     break;
             }
 
@@ -78,8 +72,6 @@ public class ClientSeatAssignation {
         }catch (IllegalArgumentException | IllegalStateException e){
             System.out.println(e.getMessage());
         }
-//        catch (MalformedURLException me) {
-//            System.out.println("ERROR: Malformed URL");
-//        }
+
     }
 }

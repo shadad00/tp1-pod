@@ -1,7 +1,6 @@
 package ar.edu.itba.models;
 
 import java.io.Serializable;
-import java.util.Comparator;
 
 public enum SeatCategory implements Serializable{
     BUSINESS("BUSINESS"),

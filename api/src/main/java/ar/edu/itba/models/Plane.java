@@ -8,35 +8,15 @@ public class Plane implements Serializable {
 
     private final String modelName;
     private final EnumMap<SeatCategory, PlaneCategoryInformation> categoryRows;
-    private final Integer seats;
-
 
 
     public Plane(String modelName, EnumMap<SeatCategory, PlaneCategoryInformation> categoryRows) {
         this.modelName = modelName;
         this.categoryRows = categoryRows;
-        this.seats = categoryRows.values().stream().mapToInt(PlaneCategoryInformation::getTotalSeats).reduce(0, Integer::sum);
     }
 
     public PlaneCategoryInformation getCategoryDescription(SeatCategory category){
         return this.categoryRows.get(category);
-    }
-
-    public boolean seatExists(int row, int col){
-        int totalRows;
-        for (SeatCategory category : SeatCategory.values()) {
-            if(categoryRows.get(category)!=null && categoryRows.get(category).contains(row, col))
-                return true;
-        }
-        return false;
-    }
-
-    public String getModelName(){
-        return modelName;
-    }
-
-    public Integer getSeats() {
-        return seats;
     }
 
     @Override

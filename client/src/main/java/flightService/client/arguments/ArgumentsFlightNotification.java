@@ -4,7 +4,7 @@ package flightService.client.arguments;
 import java.util.Properties;
 
 public class ArgumentsFlightNotification {
-    private String serverAddress;
+    private String address;
     private String passenger;
     private String flightCode;
 
@@ -14,18 +14,10 @@ public class ArgumentsFlightNotification {
     private static final String FLIGHT="flight";
 
 
-    public String getServerAddress() {
-        return serverAddress;
-    }
 
-    public Integer getPort(){
-        String[] strings = serverAddress.split(":");
-        return Integer.getInteger(strings[1]);
-    }
 
     public String getAddress(){
-        String[] strings = serverAddress.split(":");
-        return strings[0];
+        return address;
     }
 
     public String getPassenger() {
@@ -43,7 +35,7 @@ public class ArgumentsFlightNotification {
 
         if(properties.containsKey(SERVER)){
 
-            this.serverAddress = properties.getProperty(SERVER);
+            this.address = properties.getProperty(SERVER);
         }else{
             throw new IllegalArgumentException("Invalid argument for server address");
         }

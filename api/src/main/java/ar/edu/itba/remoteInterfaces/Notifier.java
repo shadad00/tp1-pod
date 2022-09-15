@@ -2,8 +2,6 @@ package ar.edu.itba.remoteInterfaces;
 
 import ar.edu.itba.models.Flight;
 import ar.edu.itba.models.Seat;
-import ar.edu.itba.models.SeatCategory;
-import ar.edu.itba.models.Ticket;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

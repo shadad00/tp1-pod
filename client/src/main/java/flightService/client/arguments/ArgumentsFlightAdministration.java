@@ -1,7 +1,5 @@
 package flightService.client.arguments;
 
-
-import java.nio.file.Path;
 import java.util.Properties;
 
 /**
@@ -31,12 +29,10 @@ import java.util.Properties;
 
 public class ArgumentsFlightAdministration {
 
-    private String serverAddress;
     private String action;
     private String inPath;
     private String flightCode;
     private String address;
-    private int port;
 
 
     private static final String SERVER="serverAddress";
@@ -44,14 +40,6 @@ public class ArgumentsFlightAdministration {
     private static final String IN_PATH="inPath";
     private static final String FLIGHT="flight";
 
-
-    public String getServerAddress() {
-        return serverAddress;
-    }
-
-    public Integer getPort(){
-        return port;
-    }
 
     public String getAddress(){
         return  address;
@@ -77,14 +65,10 @@ public class ArgumentsFlightAdministration {
 
 
         if(properties.containsKey(SERVER)){
-            this.serverAddress = properties.getProperty(SERVER);
-
-            String[] strings = serverAddress.split(":");
-            address = strings[0];
-            port = Integer.parseInt(strings[1]);
+             address = properties.getProperty(SERVER);
+;
         }
         else{
-//            System.out.println("serverAddress not found");
             throw new IllegalArgumentException("Invalid argument for server address");
         }
 

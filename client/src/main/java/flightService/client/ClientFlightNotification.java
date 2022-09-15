@@ -22,20 +22,13 @@ public class ClientFlightNotification {
             ArgumentsFlightNotification clientArguments = new ArgumentsFlightNotification();
 
             // Parsing the arguments
-            try {
-                clientArguments.parseArguments();
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
+            clientArguments.parseArguments();
+
 
             final Notifier notifier = new NotifierImpl();
             final Remote remoteNotifier = UnicastRemoteObject.exportObject(notifier,0);
-//TODO: cortar el notification cuando sea necesario GASPAR (Exception en el server?)
 
 
-//            final Registry registry = LocateRegistry.getRegistry(clientArguments.getAddress(), clientArguments.getPort());
-//
-//            final FlightNotification service = (FlightNotification) registry.lookup(FlightNotification.class.getName());
             final FlightNotification service = (FlightNotification) Naming.lookup("//" + clientArguments.getAddress() + "/" + FlightNotification.class.getName());
             service.registerUser(clientArguments.getFlightCode(), clientArguments.getPassenger(), notifier);
 
@@ -44,12 +37,9 @@ public class ClientFlightNotification {
             System.out.println("ERROR: Exception in the remote server");
         } catch (NotBoundException nbe) {
             System.out.println("ERROR: Service not bound");
-        } catch (RuntimeException | IllegalUserRegistration | MalformedURLException re) {
+        } catch (IllegalUserRegistration | MalformedURLException | RuntimeException re) {
             System.out.println(re.getMessage());
         }
-//        catch (MalformedURLException me) {
-//            System.out.println("ERROR: Malformed URL");
-//        }
 
     }
 }

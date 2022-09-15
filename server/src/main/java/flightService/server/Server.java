@@ -1,6 +1,5 @@
 package flightService.server;
 
-import ar.edu.itba.models.Flight;
 import ar.edu.itba.remoteInterfaces.FlightAdministration;
 import ar.edu.itba.remoteInterfaces.FlightNotification;
 import ar.edu.itba.remoteInterfaces.SeatAssignation;
@@ -11,8 +10,6 @@ import servant.FlightAdministrationImpl;
 import servant.FlightNotificationImpl;
 import servant.SeatAssignationImpl;
 import servant.SeatMapImpl;
-
-import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -20,9 +17,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Server {
-    private static Logger logger = LoggerFactory.getLogger(Server.class);
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    public static void main(String[] args) throws RemoteException , AlreadyBoundException {
+    public static void main(String[] args) throws RemoteException  {
         logger.info("flightService Server Starting ...");
         FlightCentral flightCentral = new FlightCentral();
         FlightNotificationImpl flightNotification = new FlightNotificationImpl(flightCentral);

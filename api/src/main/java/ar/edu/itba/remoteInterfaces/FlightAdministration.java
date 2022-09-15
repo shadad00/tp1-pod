@@ -6,8 +6,6 @@ import ar.edu.itba.models.utils.RowColumnPair;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface FlightAdministration extends Remote {

@@ -7,21 +7,18 @@ import ar.edu.itba.remoteInterfaces.FlightAdministration;
 import flightService.server.FlightCentral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static java.lang.Thread.sleep;
-
 public class FlightAdministrationImpl implements FlightAdministration {
 
     private final FlightCentral flightCentral;
-    private static Logger LOG = LoggerFactory.getLogger(FlightAdministrationImpl.class);
-    private final String mutex_models="MODELS";
-    private final String mutex_flights="FLIGHTS";
+    private static final Logger LOG = LoggerFactory.getLogger(FlightAdministrationImpl.class);
+    private final static String mutex_models="MODELS";
+    private final static String mutex_flights="FLIGHTS";
 
     public FlightAdministrationImpl(FlightCentral flightCentral){
         this.flightCentral=flightCentral;
@@ -157,9 +154,7 @@ public class FlightAdministrationImpl implements FlightAdministration {
                                     )
                     );
 
-        StringBuilder out = new StringBuilder(cantMoved + "tickets where changed.\n").append(sb);
-
-        return out.toString();
+        return cantMoved + " tickets where changed.\n" + sb;
 
     }
 

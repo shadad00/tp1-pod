@@ -68,34 +68,19 @@ public class FlightTicketsMap implements Serializable {
     }
 
 
-    public Ticket assignSeat(Integer row, Integer col,Ticket ticket) throws IllegalStateException{
-//        if(!contains(row, col))
-//            throw new IllegalArgumentException();
+    public void assignSeat(Integer row, Integer col, Ticket ticket) throws IllegalStateException{
 
-        // trato de asignarle el asiento pedido
         if (isSeatAvailable(row, col)) {
             int newRow = getRealRowIndex(row);
             ticket.assignSeat(new Seat(row,col, categoryInformation.getCategory()));
            synchronized (mutex){
                ticketSeats[newRow][col] = ticket;
-               return ticketSeats[newRow][col];
+               return;
            }
         }
 
-        // trato de asignarle un asiento libre de esta categoria
-        /*for (int i = 0; i < ticketSeats.length; i++) {
-            for (int j = 0; j < ticketSeats[0].length; j++) {
-                if (isSeatAvailable(i, j)) {
-                    ticket.assignSeat(new Seat(i,j,ticket.getCategory()));
-                    ticketSeats[i][j] = ticket;
-                    return ticketSeats[i][j];
-                }
 
-            }
-
-        }*/
         throw new IllegalStateException("Seat is not available");
-        //TODO: chequear bien si es la forma correcta de informarlo
     }
 
     public void freeSeat(Integer row, Integer column){

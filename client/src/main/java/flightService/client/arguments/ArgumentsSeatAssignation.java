@@ -13,7 +13,7 @@ import java.util.Properties;
  */
 public class ArgumentsSeatAssignation{
 
-    private String serverAddress;
+    private String address;
     private String action;
     private String flightCode;
     private String passenger;
@@ -32,18 +32,8 @@ public class ArgumentsSeatAssignation{
     private static final String ORIGINAL_FLIGHT="originalFlight";
 
 
-    public String getServerAddress() {
-        return serverAddress;
-    }
-
-    public Integer getPort(){
-        String[] strings = serverAddress.split(":");
-        return Integer.getInteger(strings[1]);
-    }
-
     public String getAddress(){
-        String[] strings = serverAddress.split(":");
-        return strings[0];
+        return address;
     }
 
     public String getAction() {
@@ -76,7 +66,7 @@ public class ArgumentsSeatAssignation{
 
         if(properties.containsKey(SERVER)){
 
-            this.serverAddress = properties.getProperty(SERVER);
+            this.address = properties.getProperty(SERVER);
         }else{
             throw new IllegalArgumentException("Invalid argument for server address");
         }

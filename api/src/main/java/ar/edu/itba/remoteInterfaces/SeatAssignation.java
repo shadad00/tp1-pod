@@ -1,10 +1,7 @@
 package ar.edu.itba.remoteInterfaces;
 
-import ar.edu.itba.models.Flight;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
 
 public interface SeatAssignation extends Remote {
 

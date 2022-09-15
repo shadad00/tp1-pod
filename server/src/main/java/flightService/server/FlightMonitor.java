@@ -3,8 +3,6 @@ package flightService.server;
 import ar.edu.itba.models.Flight;
 import ar.edu.itba.models.Seat;
 
-import java.rmi.RemoteException;
-
 /**
  * Used internally on server side to notification service.
  **/
