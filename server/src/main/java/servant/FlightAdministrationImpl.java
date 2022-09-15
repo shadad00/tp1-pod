@@ -112,47 +112,52 @@ public class FlightAdministrationImpl implements FlightAdministration {
 
         AtomicInteger cantMoved = new AtomicInteger();
         StringBuilder sb = new StringBuilder();
-            flightCentral.getFlights().values().stream().filter(flight -> flight.getStatus().equals(FlightStatus.CANCELLED))
-                    .sorted(Comparator.comparing(Flight::getFlightCode))
-                    //for each cancelled flight ordered by flightCode.
-                    .forEach(
-                            oldFlight -> oldFlight.getTickets().stream().sorted(Comparator.comparing(Ticket::getPassenger))
-                                    //For each passenger in the flight order by Passenger's name.
-                                    .forEach(
-                                            ticket -> {
+        List<Flight> list = flightCentral.getFlights().values().stream().filter(flight -> flight.getStatus().equals(FlightStatus.CANCELLED))
+                .sorted(Comparator.comparing(Flight::getFlightCode)).collect(Collectors.toList());
 
-                                                List<AlternativeFlight> alternatives = flightCentral.getAlternatives(oldFlight.getFlightCode(), ticket.getPassenger());
+        for (Flight oldFlight : list) {
+            synchronized (oldFlight.getFlightCode()) {
+                oldFlight.getTickets().stream().sorted(Comparator.comparing(Ticket::getPassenger))
+                        //For each passenger in the flight order by Passenger's name.
+                        .forEach(
+                                ticket -> {
 
-                                                if (alternatives.isEmpty()) {
-                                                    LOG.info("No alternatives for " + ticket.getPassenger() + " to " + oldFlight.getDestiny());
-                                                    sb.append("Cannot find alternative flight for ").append(ticket.getPassenger()).append(" to ").append(oldFlight.getDestiny()).append("\n");
-                                                } else {
-                                                    cantMoved.getAndIncrement();
-                                                    List<Flight> collect = alternatives.stream().sorted().map((alt) -> flightCentral.getFlight(alt.getFlightCode())).collect(Collectors.toList());
+                                    List<AlternativeFlight> alternatives = flightCentral.getAlternatives(oldFlight.getFlightCode(), ticket.getPassenger());
 
-                                                    Flight aux=null;
+                                    if (alternatives.isEmpty()) {
+                                        LOG.info("No alternatives for " + ticket.getPassenger() + " to " + oldFlight.getDestiny());
+                                        sb.append("Cannot find alternative flight for ").append(ticket.getPassenger()).append(" to ").append(oldFlight.getDestiny()).append("\n");
+                                    } else {
+                                        cantMoved.getAndIncrement();
+                                        List<Flight> collect = alternatives.stream().sorted().map((alt) -> flightCentral.getFlight(alt.getFlightCode())).collect(Collectors.toList());
 
-                                                    for (Flight flight : collect) {
-                                                        synchronized (flight.getFlightCode()) {
-                                                            if (!flight.getStatus().equals(FlightStatus.CANCELLED)) {
-                                                                    oldFlight.deletePassengerTicket(ticket.getPassenger());
-                                                                    ticket.clearSeat();
-                                                                    flight.addTicket(ticket);
-                                                                    LOG.info("Moving " + ticket.getPassenger() + " to " + flight.getFlightCode());
-                                                                    aux=flight;
-                                                                    break;
-                                                            }
-                                                        }
-                                                    }
+                                        Flight aux = null;
 
-                                                    if(aux == null)
-                                                        sb.append("Cannot find alternative flight for").append(ticket.getPassenger()).append(" to ").append(oldFlight.getDestiny()).append("\n");
-                                                    else flightCentral.notifyFlightChange(ticket.getPassenger(),oldFlight,aux);
+                                        for (Flight flight : collect) {
+                                            synchronized (flight.getFlightCode()) {
+                                                if (!flight.getStatus().equals(FlightStatus.CANCELLED)) {
+                                                    oldFlight.deletePassengerTicket(ticket.getPassenger());
+                                                    ticket.clearSeat();
+                                                    flight.addTicket(ticket);
+                                                    LOG.info("Moving " + ticket.getPassenger() + " to " + flight.getFlightCode());
+                                                    aux = flight;
+                                                    break;
 
                                                 }
                                             }
-                                    )
-                    );
+                                        }
+
+                                        if (aux == null)
+                                            sb.append("Cannot find alternative flight for").append(ticket.getPassenger()).append(" to ").append(oldFlight.getDestiny()).append("\n");
+                                        else flightCentral.notifyFlightChange(ticket.getPassenger(), oldFlight, aux);
+
+                                    }
+                                });
+            }
+
+
+
+    }
 
         return cantMoved + " tickets where changed.\n" + sb;
 

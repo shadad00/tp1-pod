@@ -117,7 +117,7 @@ public class Flight implements Serializable {
 
     public void deletePassengerTicket(String passenger){
         Ticket ticket = Optional.ofNullable(tickets.get(passenger))
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("Passenger does not exist in this flight"));
         freeSeatByPassenger(ticket);
         tickets.remove(passenger);
     }
@@ -133,7 +133,7 @@ public class Flight implements Serializable {
 
     public void addTicket(Ticket ticket){
         if(tickets.containsKey(ticket.getPassenger()))
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Passenger already has a ticket for this flight");
         tickets.put(ticket.getPassenger(), ticket);
     }
 
