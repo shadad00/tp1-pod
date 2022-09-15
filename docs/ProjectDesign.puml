@@ -1,0 +1,75 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class FlightCentral{
+- ConcurrentHashMap<String, Flight> flights
+- ConcurrentHashMap<String, Plane> models
+}
+note left
+Clase utilizada para almacenar los modelos
+y los vuelos ingresados, utilizando como
+clave el nombre del modelo y el codigo de
+vuelo respectivamente.
+end note
+
+enum FlightStatus
+enum SeatCategory
+
+class Flight{
+- String flightCode
+- String destiny
+- FlightStatus status
+- EnumMap<SeatCategory, FlightTicketsMap> flightSeatsMap
+- ConcurrentHashMap<String, Ticket> tickets
+}
+
+class FlightTicketsMap{
+- PlaneCategoryInformation categoryInformation
+- Ticket[][] ticketSeats
+}
+
+class Plane{
+- String modelName
+- EnumMap<SeatCategory, PlaneCategoryInformation> categoryRows
+- Integer totalSeats
+}
+
+class PlaneCategoryInformation{
+- Integer initialRow
+- Integer finalRow
+- Integer columnsNumber
+- SeatCategory category
+}
+class Seat{
+- int row, column
+- SeatCategory category
+}
+
+class Ticket{
+-String passenger
+- SeatCategory category
+- Seat seat
+}
+
+Flight *-- FlightStatus
+Flight *-- SeatCategory
+Flight *-- Ticket
+Flight *-- FlightTicketsMap
+
+FlightTicketsMap *-- PlaneCategoryInformation
+FlightTicketsMap *-- Ticket
+
+Plane *-- SeatCategory
+Plane *-- PlaneCategoryInformation
+
+PlaneCategoryInformation *-- SeatCategory
+
+Seat *-- SeatCategory
+
+Ticket *-- SeatCategory
+Ticket *-- Seat
+
+FlightCentral *-- Flight
+FlightCentral *-- Plane
+
+@enduml
