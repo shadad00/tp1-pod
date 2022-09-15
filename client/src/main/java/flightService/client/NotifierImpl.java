@@ -67,6 +67,7 @@ public class NotifierImpl implements Notifier {
                 newFlight.getFlightCode() + " with destination " + newFlight.getDestiny()+
                 " from Flight " + oldFlight.getFlightCode() +
                 " with destination " + oldFlight.getDestiny());
+        System.out.println("You are following flight " + newFlight.getFlightCode() + " with destination " + newFlight.getDestiny());
 
     }
 }

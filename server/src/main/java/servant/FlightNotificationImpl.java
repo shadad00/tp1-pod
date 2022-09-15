@@ -149,7 +149,7 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
     }
 
     @Override
-    public void notifyFlightChange(String passenger, Flight oldFlight, Flight newFlight) {
+    public void notifyFlightChange(String passenger, Flight oldFlight, Flight newFlight){
         LOG.info("Flight change callbacks being processed");
 
         if(registeredUsers.containsKey(oldFlight)){
@@ -167,9 +167,6 @@ public class FlightNotificationImpl implements FlightNotification, FlightMonitor
                 });
                 //registeredUsers.get(oldFlight).remove(entries);
                 registeredUsers.putIfAbsent(newFlight, Collections.synchronizedList(new ArrayList<>()));
-//                if(!registeredUsers.containsKey(newFlight)){
-//                    registeredUsers.put(newFlight, new ArrayList<>());
-//                }
                 registeredUsers.get(newFlight).add(entries);
 
             }
