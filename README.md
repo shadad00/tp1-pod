@@ -25,49 +25,49 @@ mvn clean install
 ```
 Extraccion de los .tar.gz con los ejecutables
 ```
-tar -xvf ./server/target/tp1-g14-server-1.0-SNAPSHOT-bin.tar.gz
-tar -xvf ./client/target/tp1-g14-client-1.0-SNAPSHOT-bin.tar.gz
+cd server/target
+tar -xvf tp1-g14-server-1.0-SNAPSHOT-bin.tar.gz
+cd tp1-g14-server-1.0-SNAPSHOT
+chmod u+x *
 ```
-
-## Permisos de ejecucion 🚀
-Para asignar permisos de ejecucion. 
 ```
-chmod u+x ./tp1-g14-server-1.0-SNAPSHOT/run-registry.sh
-chmod u+x ./tp1-g14-server-1.0-SNAPSHOT/run-server.sh
+cd ../../client/target
+tar -xvf tp1-g14-client-1.0-SNAPSHOT-bin.tar.gz
+cd tp1-g14-client-1.0-SNAPSHOT
+chmod u+x *
 ```
-
 
 ## Ejecución 🚀
-Para correr el registry
+Para correr el registry (dentro del directorio server/target/tp1-g14-server-1.0-SNAPSHOT)
 ```
-./tp1-g14-server-1.0-SNAPSHOT/run-registry.sh
+./run-registry.sh
 ```
-Para correr el server
+Para correr el server (dentro del directorio server/target/tp1-g14-server-1.0-SNAPSHOT)
 ```
-./tp1-g14-server-1.0-SNAPSHOT/run-server.sh
+./run-server.sh
 ```
 
-Para ejecutar el cliente de administracion de vuelos
+Para ejecutar el cliente de administracion de vuelos (dentro del directorio client/target/tp1-g14-client-1.0-SNAPSHOT)
 ```
-./tp1-g14-client-1.0-SNAPSHOT/run-admin -DserverAddress=xx.xx.xx.xx:yyyy 
+./run-admin -DserverAddress=xx.xx.xx.xx:yyyy 
 -Daction=actionName [ -DinPath=filename | -Dflight=flightCode ]
 ```
 Para ejecutar el cliente de asignacion de asientos
 ```
-./tp1-g14-client-1.0-SNAPSHOT/run-seatAssign -DserverAddress=xx.xx.xx.xx:yyyy 
+./run-seatAssign -DserverAddress=xx.xx.xx.xx:yyyy 
 -Daction=actionName -Dflight=flightCode [ -Dpassenger=name | -Drow=num | -Dcol=L | 
 -DoriginalFlight=originFlightCode ]
 ```
 
 Para ejecutar el cliente de Mapa de asientos
 ```
-./tp1-g14-client-1.0-SNAPSHOT/run-seatMap -DserverAddress=xx.xx.xx.xx:yyyy 
+./run-seatMap -DserverAddress=xx.xx.xx.xx:yyyy 
 -Dflight=flightCode [ -Dcategory=catName | -Drow=rowNumber ] -DoutPath=output.csv
 ```
 
 Para ejecutar el cliente de notificacion de usuarios
 ```
-./tp1-g14-client-1.0-SNAPSHOT/run-notifications -DserverAddress=xx.xx.xx.xx:yyyy 
+./run-notifications -DserverAddress=xx.xx.xx.xx:yyyy 
 -Dflight=flightCode -Dpassenger=name
 ```
 
