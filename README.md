@@ -25,43 +25,49 @@ mvn clean install
 ```
 Extraccion de los .tar.gz con los ejecutables
 ```
-tar -xvf ./server/target/tp1-g14-server-1.0-SNAPSHOT.tar.gz
-tar -xvf ./client/target/tp1-g14-client-1.0-SNAPSHOT.tar.gz
+tar -xvf ./server/target/tp1-g14-server-1.0-SNAPSHOT-bin.tar.gz
+tar -xvf ./client/target/tp1-g14-client-1.0-SNAPSHOT-bin.tar.gz
 ```
 
+## Permisos de ejecucion 🚀
+Para asignar permisos de ejecucion. 
+```
+chmod u+x ./tp1-g14-server-1.0-SNAPSHOT/run-registry.sh
+chmod u+x ./tp1-g14-server-1.0-SNAPSHOT/run-server.sh
+```
 
 
 ## Ejecución 🚀
 Para correr el registry
 ```
-./server/target/tp1-g14-server-1.0-SNAPSHOT/run-registry.sh
+./tp1-g14-server-1.0-SNAPSHOT/run-registry.sh
 ```
 Para correr el server
 ```
-./server/target/tp1-g14-server-1.0-SNAPSHOT/run-server.sh
+./tp1-g14-server-1.0-SNAPSHOT/run-server.sh
 ```
 
 Para ejecutar el cliente de administracion de vuelos
 ```
-./client/target/tp1-g14-client-1.0-SNAPSHOT/run-admin -DserverAddress=xx.xx.xx.xx:yyyy 
+./tp1-g14-client-1.0-SNAPSHOT/run-admin -DserverAddress=xx.xx.xx.xx:yyyy 
 -Daction=actionName [ -DinPath=filename | -Dflight=flightCode ]
 ```
 Para ejecutar el cliente de asignacion de asientos
 ```
-./client/target/tp1-g14-client-1.0-SNAPSHOT/run-seatAssign -DserverAddress=xx.xx.xx.xx:yyyy 
+./tp1-g14-client-1.0-SNAPSHOT/run-seatAssign -DserverAddress=xx.xx.xx.xx:yyyy 
 -Daction=actionName -Dflight=flightCode [ -Dpassenger=name | -Drow=num | -Dcol=L | 
 -DoriginalFlight=originFlightCode ]
 ```
 
 Para ejecutar el cliente de Mapa de asientos
 ```
-./client/target/tp1-g14-client-1.0-SNAPSHOT/run-seatMap -DserverAddress=xx.xx.xx.xx:yyyy 
+./tp1-g14-client-1.0-SNAPSHOT/run-seatMap -DserverAddress=xx.xx.xx.xx:yyyy 
 -Dflight=flightCode [ -Dcategory=catName | -Drow=rowNumber ] -DoutPath=output.csv
 ```
 
 Para ejecutar el cliente de notificacion de usuarios
 ```
-./client/target/tp1-g14-client-1.0-SNAPSHOT/run-notifications -DserverAddress=xx.xx.xx.xx:yyyy 
+./tp1-g14-client-1.0-SNAPSHOT/run-notifications -DserverAddress=xx.xx.xx.xx:yyyy 
 -Dflight=flightCode -Dpassenger=name
 ```
 

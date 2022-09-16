@@ -4,11 +4,11 @@ import ar.edu.itba.exceptions.IllegalUserRegistration;
 import ar.edu.itba.models.Flight;
 import ar.edu.itba.models.FlightStatus;
 import ar.edu.itba.models.Seat;
+import ar.edu.itba.models.utils.Pair;
 import ar.edu.itba.remoteInterfaces.FlightNotification;
 import flightService.server.FlightCentral;
 import flightService.server.FlightMonitor;
 import ar.edu.itba.remoteInterfaces.Notifier;
-import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 public class FlightNotificationImpl implements FlightNotification, FlightMonitor {
 
     private final FlightCentral flightCentral;
-    private final ConcurrentHashMap<Flight, List< Pair<String, Notifier> >>registeredUsers;
+    private final ConcurrentHashMap<Flight, List<Pair<String, Notifier>>>registeredUsers;
     private static final Logger LOG = LoggerFactory.getLogger(FlightNotificationImpl.class);
     private static final int NUMBER_OF_THREADS = 8;
     private static final ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
